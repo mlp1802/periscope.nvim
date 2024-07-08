@@ -1,6 +1,7 @@
 local telescope = require('telescope');
 local scripts = require('periscope.scripts');
 local model = require('periscope.model');
+local pickers = require('periscope.pickers');
 local function main()
 	print("Hello from our plugin")
 end
@@ -28,7 +29,10 @@ local function setup_user_commands()
 		model.new_task("New Task")
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeShowFiles', function()
-		model.show_files_for_current_task()
+		pickers.show_files_for_current_task()
+	end, {})
+	vim.api.nvim_create_user_command('PeriscopeShowTasks', function()
+		pickers.show_all_tasks()
 	end, {})
 end
 local function setup_shortcuts()

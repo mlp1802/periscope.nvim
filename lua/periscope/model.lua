@@ -1,13 +1,5 @@
-local current_works
+local current_workspace = nil
 local script = require('periscope.scripts')
-
-local telescope = require('telescope')
-local action_state = require('telescope.actions.state')
-local actions = require('telescope.actions')
-local pickers = require('telescope.pickers')
-local finders = require('telescope.finders')
-local sorters = require('telescope.sorters')
-local conf = require('telescope.config').values
 local START_USAGE = 10
 local function new_file(path)
 	return {
@@ -65,6 +57,7 @@ local function new_task()
 		end
 	end)
 end
+
 -- Gets the current task
 local function get_current_task()
 	local workspace = get_current_workspace()
@@ -72,48 +65,8 @@ local function get_current_task()
 	return workspace.tasks[task_id]
 end
 
--- Custom sorter function
-local function usage_sorter()
-	return sorters.Sorter:new {
-		scoring_function = function(_, prompt, ordinal, entry)
-			return -entry.value.usage
-		end,
-	}
-end
 
 -- Shows files for the current task
-local function show_files_for_current_task()
-	local task = get_current_task()
-	if not task then
-		print("No current task")
-		return
-	end
-
-	local opts = {}
-	pickers.new(opts, {
-		prompt_title = "Files for Current Task",
-		finder = finders.new_table {
-			results = task.files,
-			entry_maker = function(entry)
-				return {
-					value = entry,
-					display = entry.path,
-					ordinal = entry.path,
-				}
-			end,
-		},
-		--sorter = conf.generic_sorter(opts),
-		sorter = usage_sorter(),
-		attach_mappings = function(prompt_bufnr, map)
-			actions.select_default:replace(function()
-				actions.close(prompt_bufnr)
-				local selection = action_state.get_selected_entry()
-				vim.cmd("edit " .. selection.value.path)
-			end)
-			return true
-		end,
-	}):find()
-end
 
 -- Removes a file from the current task
 local function remove_file_from_current_task(path)
@@ -127,6 +80,7 @@ local function remove_file_from_current_task(path)
 		end
 	end
 end
+
 -- Adds a file to the current task
 local function add_file_to_current_task(path)
 	local task = get_current_task()
@@ -170,14 +124,14 @@ local function get_all_files_for_current_task()
 	return task.files
 end
 --Test
-print("Hello from model.lua")
-create_task("SKOD");
-add_file_to_current_task("test.lua")
-show_files_for_current_task()
---
+
 return {
 	new_task = new_task,
-	show_files_for_current_task = show_files_for_current_task,
-	buffer_entered = buffer_entered
+	buffer_entered = buffer_entered,
+	get_current_task = get_current_task,
+	set_current_task = set_current_task,
+	create_task = create_task,
+	add_file_to_current_task = add_file_to_current_task,
+	get_all_tasks = get_all_tasks,
 
 }
