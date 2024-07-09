@@ -1,5 +1,7 @@
+require('periscope.lume')
 local current_workspace = nil
 local START_USAGE = 20
+
 local function new_file(path)
 	return {
 		path = path,
@@ -79,7 +81,6 @@ local function create_task(name)
 	--print("Creating task: " .. name)
 	local workspace = get_current_workspace()
 	workspace.task_id = workspace.task_id + 1
-
 	local task_id = workspace.task_id;
 	local task = {
 		id = task_id,
@@ -87,7 +88,7 @@ local function create_task(name)
 		files = {}
 
 	}
-	table.insert(workspace.tasks, task);
+	workspace.tasks[task_id] = task
 	--print("number of tasks: " .. #workspace.tasks)
 	set_current_task(task_id);
 	--print("Task created: " .. name)
@@ -121,7 +122,6 @@ local function get_current_task_name()
 		return nil
 	end
 end
--- Shows files for the current task
 
 -- Removes a file from the current task
 local function remove_file_from_current_task(path)
@@ -200,8 +200,8 @@ end
 local function delete_current_task()
 	local workspace = get_current_workspace()
 	local name = get_current_task_name() or "No task"
-	table.remove(workspace.tasks, workspace.current_task_id)
-	workspace.current_task_id = 0
+	workspace.tasks[workspace.current_task_id] = nil
+	workspace.current_task_id = nil
 	save_workspace()
 	print("Task deleted: " .. name)
 end

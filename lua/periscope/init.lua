@@ -48,7 +48,6 @@ local function setup_user_commands()
 		model().delete_current_task()
 	end, {})
 end
-setup = setup_user_commands
 function setup(f)
 	setup_auto_commands();
 	setup_user_commands();
