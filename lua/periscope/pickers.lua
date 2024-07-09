@@ -42,6 +42,7 @@ end
 
 
 local function show_files_for_current_task()
+	model().remove_deleted_files_from_current_tasks()
 	local task = model().get_current_task()
 	if not task then
 		print("No current task")
@@ -75,7 +76,6 @@ end
 local function show_all_tasks()
 	--print("NUMBER OF Tasks: " .. #tasks)
 	local current_task_name = model().get_current_task_name() or "No task selected";
-
 	local current_task_id = model().get_current_task_id() or 999;
 	print("Current task id: " .. current_task_id)
 
