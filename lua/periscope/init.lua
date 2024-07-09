@@ -11,7 +11,6 @@ function nvimtree()
 end
 
 local function main()
-	print("Hello from our plugin")
 end
 
 local function setup_auto_commands()
@@ -37,6 +36,14 @@ local function setup_auto_commands()
 			model().buffer_left(args.file)
 		end,
 	})
+	vim.api.nvim_create_autocmd({ "BufDelete" }, {
+		pattern = { "*.*" },
+		group = augroup,
+		callback = function(args)
+			print("Buffer deleted")
+			--model().buffer_left(args.file)
+		end,
+	})
 end
 local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeNewTask', function()
@@ -58,7 +65,6 @@ local function setup_user_commands()
 		nvimtree().unfilter_tree() --vim.cmd('let g:NERDTreeNodeFilterFunction = function("v:lua.custom_filter")')
 	end, {})
 end
-setup_user_commands()
 function setup(f)
 	setup_auto_commands();
 	setup_user_commands();

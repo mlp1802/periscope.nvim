@@ -1,7 +1,7 @@
 local lume = require('periscope.lume')
 local current_workspace = nil
 local START_USAGE = 20
-
+local lume_e = require('periscope.lume_extra')
 local function new_file(path)
 	return {
 		path = path,
@@ -46,6 +46,7 @@ local function load_workspace()
 		current_workspace = new_workspace()
 	end
 end
+
 --Gets  or creates a new workspace
 local function get_current_workspace()
 	if current_workspace == nil then
@@ -54,6 +55,8 @@ local function get_current_workspace()
 	end
 	return current_workspace
 end
+
+-- Saves the current workspace
 local function save_workspace()
 	local workspace = get_current_workspace()
 	local workspace_file_path = get_workspace_file_path()
@@ -107,10 +110,9 @@ end
 -- Gets the current task
 local function get_current_task()
 	local workspace = get_current_workspace()
-	local task = lume.filter(workspace.tasks, function(task)
+	return lume_e.find_f(workspace.tasks, function(task)
 		return task.id == workspace.current_task_id
 	end)
-	return lume.first(task)
 end
 
 local function get_current_task_name()
@@ -120,6 +122,17 @@ local function get_current_task_name()
 	else
 		return nil
 	end
+end
+local function remove_files_from_current_tasks()
+	local current_task = get_current_task()
+	if current_task == nil then
+		return
+	end
+	local filteres_files = lume.filter(current_task.files, function(file)
+		return vim.fn.filereadable(file.path)
+	end)
+	current_task.files = filteres_files
+	save_workspace()
 end
 
 -- Removes a file from the current task
@@ -167,6 +180,7 @@ local function buffer_entered(path)
 		save_workspace()
 	end
 end
+
 local function get_file_for_current_task(path)
 	local task = get_current_task()
 	if task then
@@ -178,6 +192,7 @@ local function get_file_for_current_task(path)
 	end
 	return nil
 end
+
 -- Called when a buffer is left
 local function buffer_left(path)
 	local left_file = get_file_for_current_task(path)
@@ -210,6 +225,7 @@ local function get_current_task_id()
 	return workspace.current_task_id
 end
 return {
+	remove_deleted_files_from_current_tasks = remove_files_from_current_tasks,
 	new_task = new_task,
 	buffer_entered = buffer_entered,
 	buffer_left = buffer_left,
