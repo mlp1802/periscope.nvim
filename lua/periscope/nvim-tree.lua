@@ -40,8 +40,9 @@ local function filter_tree()
 	end
 	--filter.custom_function = nil
 	--tree.open()
+
+	tree.expand_all()
 	tree.reload() -- This applies the filter
-	--tree.expand_all()
 end
 local function unfilter_tree()
 	filter.custom_function = nil --prev_filter_function
