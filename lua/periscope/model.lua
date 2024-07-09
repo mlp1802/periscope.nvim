@@ -71,7 +71,6 @@ end
 -- Sets the current task
 local function set_current_task(task_id)
 	local workspace = get_current_workspace()
-	print("Setting current task: " .. task_id)
 	workspace.current_task_id = task_id
 	save_workspace()
 end

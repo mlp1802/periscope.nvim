@@ -6,6 +6,10 @@ function model()
 	return require('periscope.model')
 end
 
+function nvimtree()
+	return require('periscope.nvim-tree')
+end
+
 local function main()
 	print("Hello from our plugin")
 end
@@ -47,12 +51,18 @@ local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeDeleteCurrentTask', function()
 		model().delete_current_task()
 	end, {})
+	vim.api.nvim_create_user_command('TaskTree', function()
+		require('nvim-tree.api').tree.open()
+		nvimtree().filter_nvim_tree_nodes() --vim.cmd('let g:NERDTreeNodeFilterFunction = function("v:lua.custom_filter")')
+	end, {})
 end
+
 function setup(f)
 	setup_auto_commands();
 	setup_user_commands();
 end
 
+setup()
 return {
 	setup = setup,
 	model = model(),
