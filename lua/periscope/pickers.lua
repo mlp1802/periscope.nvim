@@ -13,17 +13,25 @@ end
 local conf = require('telescope.config').values
 -- Custom sorter function
 local function file_sorter()
+	local default_sorter = conf.generic_sorter({})
 	return sorters.Sorter:new {
 		scoring_function = function(_, prompt, ordinal, entry)
-			local last_file = model().get_current_workspace().last_file or "no_last_file"
-			--print("last_file: " .. last_file .. "," .. entry.value.path)
-			if entry.value.path == last_file then
-				return 9999999999999
+			--when no prompt, sort by usage
+			if prompt == "" then
+				local last_file = model().get_current_workspace().last_file or "no_last_file"
+				if entry.value.path == last_file then
+					return 9999999999999
+				end
+				return -entry.value.usage
+			else
+				--else use default sorter
+				return default_sorter:scoring_function(prompt, ordinal, entry)
 			end
-			return -entry.value.usage
 		end,
+
 	}
 end
+
 local function get_string_numeric_value(str)
 	--return value
 	local str = str:lower()
@@ -52,6 +60,8 @@ local function show_files_for_current_task()
 		return
 	end
 	local opts = {}
+
+
 	pickers.new(opts, {
 		prompt_title = task.name .. ": files",
 		finder = finders.new_table {
