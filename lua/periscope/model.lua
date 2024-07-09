@@ -1,4 +1,5 @@
 local lume = require('periscope.lume')
+local nvim_tree = require('periscope.nvim-tree')
 local current_workspace = nil
 local START_USAGE = 20
 local lume_e = require('periscope.lume_extra')
@@ -178,6 +179,7 @@ local function buffer_entered(path)
 		downgrade_files(current_task)
 		add_file_to_current_task(path)
 		save_workspace()
+		nvim_tree.filter_tree()
 	end
 end
 

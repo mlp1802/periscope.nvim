@@ -1,3 +1,4 @@
+local enabled = false
 function pickers()
 	return require('periscope.pickers')
 end
@@ -26,7 +27,7 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
-			model().buffer_entered(args.file)
+
 		end,
 	})
 	vim.api.nvim_create_autocmd({ "BufLeave", "BufWinLeave" }, {
@@ -47,22 +48,58 @@ local function setup_auto_commands()
 end
 local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeNewTask', function()
-		model().new_task()
+		if enabled then
+			model().new_task()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
+	vim.api.nvim_create_user_command('PeriscopeEnable', function()
+		enabled = true
+		print("Periscope enabled")
+		nvimtree().filter_tree()
+	end, {})
+	vim.api.nvim_create_user_command('PeriscopeDisable', function()
+		enabled = false
+		print("Periscope disabled")
+		nvimtree().unfilter_tree()
+	end, {})
+
+
 	vim.api.nvim_create_user_command('PeriscopeShowFiles', function()
-		pickers().show_files_for_current_task()
+		if enabled then
+			pickers().show_files_for_current_task()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeShowTasks', function()
-		pickers().show_all_tasks()
+		if enabled then
+			pickers().show_all_tasks()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeDeleteCurrentTask', function()
-		model().delete_current_task()
+		if enabled then
+			model().delete_current_task()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
-	vim.api.nvim_create_user_command('FilterTree', function()
-		nvimtree().filter_tree() --vim.cmd('let g:NERDTreeNodeFilterFunction = function("v:lua.custom_filter")')
+	vim.api.nvim_create_user_command('PeriscopeFilterTree', function()
+		if enabled then
+			nvimtree().filter_tree()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
-	vim.api.nvim_create_user_command('UnfilterTree', function()
-		nvimtree().unfilter_tree() --vim.cmd('let g:NERDTreeNodeFilterFunction = function("v:lua.custom_filter")')
+	vim.api.nvim_create_user_command('PeriscopeUnfilterTree', function()
+		if enabled then
+			nvimtree().unfilter_tree()
+		else
+			print("Periscope is not enabled")
+		end
 	end, {})
 end
 function setup(f)
