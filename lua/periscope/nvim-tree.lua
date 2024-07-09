@@ -39,14 +39,15 @@ local function filter_tree()
 		return true -- Exclude everything else
 	end
 	--filter.custom_function = nil
-
+	tree.open()
 	tree.reload() -- This applies the filter
+	--tree.expand_all()
 end
 local function unfilter_tree()
 	filter.custom_function = nil --prev_filter_function
 	tree.reload()
 end
---filter_tree()
+filter_tree()
 --local dir = vim.fn.getcwd();
 --tree.open({ path = dir });
 

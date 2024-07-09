@@ -4,6 +4,9 @@ local current_workspace = nil
 local START_USAGE = 20
 local lume_e = require('periscope.lume_extra')
 local nvim_tree = require('periscope.nvim-tree')
+
+--Forward declarations
+local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id
 local function new_file(path)
 	return {
 		path = path,
@@ -11,7 +14,7 @@ local function new_file(path)
 	}
 end
 -- creates a new workspace
-local function new_workspace()
+function new_workspace()
 	local workspace = {
 		task_id = 0,
 		current_task_id = 0,
@@ -21,15 +24,16 @@ local function new_workspace()
 	}
 	return workspace
 end
-local function get_project_directory()
+
+function get_project_directory()
 	return vim.fn.getcwd() -- Gets the current working directory
 end
 
-local function get_workspace_file_path()
+function get_workspace_file_path()
 	return get_project_directory() .. "/.periscope.nvim.json"
 end
 
-local function load_workspace()
+function load_workspace()
 	local workspace_file_path = get_workspace_file_path()
 	local file = io.open(workspace_file_path, "r")
 	if file then
@@ -50,7 +54,7 @@ local function load_workspace()
 end
 
 --Gets  or creates a new workspace
-local function get_current_workspace()
+function get_current_workspace()
 	if current_workspace == nil then
 		--print("Creating new workspace")
 		load_workspace()
@@ -59,7 +63,7 @@ local function get_current_workspace()
 end
 
 -- Saves the current workspace
-local function save_workspace()
+function save_workspace()
 	local workspace = get_current_workspace()
 	local workspace_file_path = get_workspace_file_path()
 	local json_data = vim.fn.json_encode(workspace)
@@ -74,14 +78,14 @@ local function save_workspace()
 end
 
 -- Sets the current task
-local function set_current_task(task_id)
+function set_current_task(task_id)
 	local workspace = get_current_workspace()
 	workspace.current_task_id = task_id
 	save_workspace()
 end
 
 -- Creates a new task and adds it to the workspace
-local function create_task(name)
+function create_task(name)
 	local workspace = get_current_workspace()
 	workspace.task_id = workspace.task_id + 1
 	local task_id = workspace.task_id;
@@ -93,32 +97,30 @@ local function create_task(name)
 	}
 	workspace.task = lume.push(workspace.tasks, task)
 	set_current_task(task_id);
+	--add current file to task
+	buffer_entered(vim.api.nvim_buf_get_name(0))
 	nvim_tree.filter_tree()
 end
 
-
-
-
 -- Creates a new task, promts user for a name
-local function new_task()
+function new_task()
 	vim.ui.input({ prompt = 'Enter task name: ' }, function(input)
 		if input then
 			create_task(input)
 		else
-			--print("Task creation canceled")
 		end
 	end)
 end
 
 -- Gets the current task
-local function get_current_task()
+function get_current_task()
 	local workspace = get_current_workspace()
 	return lume_e.find_f(workspace.tasks, function(task)
 		return task.id == workspace.current_task_id
 	end)
 end
 
-local function get_current_task_name()
+function get_current_task_name()
 	local task = get_current_task()
 	if task then
 		return task.name
@@ -126,7 +128,8 @@ local function get_current_task_name()
 		return nil
 	end
 end
-local function remove_files_from_current_tasks()
+
+function remove_files_from_current_tasks()
 	local current_task = get_current_task()
 	if current_task == nil then
 		return
@@ -139,7 +142,7 @@ local function remove_files_from_current_tasks()
 end
 
 -- Removes a file from the current task
-local function remove_file_from_current_task(path)
+function remove_file_from_current_task(path)
 	local task = get_current_task()
 	if task then
 		for i, file in ipairs(task.files) do
@@ -152,7 +155,7 @@ local function remove_file_from_current_task(path)
 end
 
 -- Adds a file to the current task
-local function add_file_to_current_task(path)
+function add_file_to_current_task(path)
 	local task = get_current_task()
 	if task then
 		remove_file_from_current_task(path)
@@ -164,7 +167,7 @@ local function add_file_to_current_task(path)
 end
 
 -- Downgrades the usage of all files in a task
-local function downgrade_files(task)
+function downgrade_files(task)
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
@@ -174,7 +177,7 @@ local function downgrade_files(task)
 end
 
 -- Called when a buffer is entered
-local function buffer_entered(path)
+function buffer_entered(path)
 	local current_task = get_current_task()
 	--print("Buffer entered: " .. path)
 	if current_task then
@@ -185,7 +188,7 @@ local function buffer_entered(path)
 	end
 end
 
-local function get_file_for_current_task(path)
+function get_file_for_current_task(path)
 	local task = get_current_task()
 	if task then
 		for i, file in ipairs(task.files) do
@@ -198,7 +201,7 @@ local function get_file_for_current_task(path)
 end
 
 -- Called when a buffer is left
-local function buffer_left(path)
+function buffer_left(path)
 	local left_file = get_file_for_current_task(path)
 	if left_file then
 		--print("Buffer recently_left left: " .. path)
@@ -207,15 +210,14 @@ local function buffer_left(path)
 	end
 end
 
-
 -- Gets all tasks
-local function get_all_tasks()
+function get_all_tasks()
 	local workspace = get_current_workspace()
 	return workspace.tasks
 end
 
 -- Deletes the current taskæ
-local function delete_current_task()
+function delete_current_task()
 	local confirm = vim.fn.confirm("Delete task?", "&Yes\n&No", 2)
 	if confirm == 1 then
 		local workspace = get_current_workspace()
@@ -228,11 +230,13 @@ local function delete_current_task()
 		print("Task deleted")
 	end
 end
+
 -- Gets the current task id
-local function get_current_task_id()
+function get_current_task_id()
 	local workspace = get_current_workspace()
 	return workspace.current_task_id
 end
+
 return {
 	remove_deleted_files_from_current_tasks = remove_files_from_current_tasks,
 	new_task = new_task,

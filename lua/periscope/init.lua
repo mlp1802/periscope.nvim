@@ -1,4 +1,4 @@
-local enabled = false
+local enabled = true
 function pickers()
 	return require('periscope.pickers')
 end
@@ -102,12 +102,13 @@ local function setup_user_commands()
 		end
 	end, {})
 end
-function setup(f)
+function setup(e)
+	enabled = e
 	setup_auto_commands();
 	setup_user_commands();
 end
 
-setup()
+setup(true)
 return {
 	setup = setup,
 	model = model(),
