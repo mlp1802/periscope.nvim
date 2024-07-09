@@ -1,5 +1,5 @@
 local current_workspace = nil
-local START_USAGE = 10
+local START_USAGE = 20
 local function new_file(path)
 	return {
 		path = path,
@@ -34,20 +34,20 @@ local function load_workspace()
 		local status, workspace_data = pcall(vim.fn.json_decode, json_data)
 		if status then
 			current_workspace = workspace_data
-			print("Workspace loaded from " .. workspace_file_path)
+			--print("Workspace loaded from " .. workspace_file_path)
 		else
-			print("Error parsing workspace file: " .. workspace_file_path)
+			--print("Error parsing workspace file: " .. workspace_file_path)
 			-- Optionally, you can also delete the corrupted file or take some other action
 		end
 	else
-		print("No workspace file found at " .. workspace_file_path)
+		--print("No workspace file found at " .. workspace_file_path)
 		current_workspace = new_workspace()
 	end
 end
 --Gets  or creates a new workspace
 local function get_current_workspace()
 	if current_workspace == nil then
-		print("Creating new workspace")
+		--print("Creating new workspace")
 		load_workspace()
 	end
 	return current_workspace
@@ -62,14 +62,9 @@ local function save_workspace()
 		file:close()
 		--print("Workspace saved to " .. workspace_file_path)
 	else
-		print("Error saving workspace to " .. workspace_file_path)
+		print("Error saving periscope workspace to " .. workspace_file_path)
 	end
 end
-
-
-
-
-
 
 -- Sets the current task
 local function set_current_task(task_id)
@@ -80,7 +75,7 @@ end
 
 -- Creates a new task and adds it to the workspace
 local function create_task(name)
-	print("Creating task: " .. name)
+	--print("Creating task: " .. name)
 	local workspace = get_current_workspace()
 	workspace.task_id = workspace.task_id + 1
 
@@ -92,9 +87,9 @@ local function create_task(name)
 
 	}
 	table.insert(workspace.tasks, task);
-	print("number of tasks: " .. #workspace.tasks)
+	--print("number of tasks: " .. #workspace.tasks)
 	set_current_task(task_id);
-	print("Task created: " .. name)
+	--print("Task created: " .. name)
 end
 
 
@@ -106,7 +101,7 @@ local function new_task()
 		if input then
 			create_task(input)
 		else
-			print("Task creation canceled")
+			--print("Task creation canceled")
 		end
 	end)
 end
@@ -145,12 +140,12 @@ end
 local function add_file_to_current_task(path)
 	local task = get_current_task()
 	if task then
-		print("ADDING FILE TO CURRENT TASK .." .. path)
+		--print("ADDING FILE TO CURRENT TASK .." .. path)
 		remove_file_from_current_task(path)
 		local file = new_file(path)
 		table.insert(task.files, file)
 	else
-		print("CANNOT ADD FILE TO CURRENT TASK")
+		--print("CANNOT ADD FILE TO CURRENT TASK")
 	end
 end
 
@@ -159,7 +154,7 @@ local function downgrade_files(task)
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
-			print("Removing file from task: " .. file.path)
+			--print("Removing file from task: " .. file.path)
 			table.remove(task.files, i)
 		end
 	end
@@ -168,7 +163,7 @@ end
 -- Called when a buffer is entered
 local function buffer_entered(path)
 	local current_task = get_current_task()
-	print("Buffer entered: " .. path)
+	--print("Buffer entered: " .. path)
 	if current_task then
 		downgrade_files(current_task)
 		add_file_to_current_task(path)
@@ -190,7 +185,7 @@ end
 local function buffer_left(path)
 	local left_file = get_file_for_current_task(path)
 	if left_file then
-		print("Buffer recently_left left: " .. path)
+		--print("Buffer recently_left left: " .. path)
 		get_current_workspace().last_file = path
 		save_workspace()
 	end
