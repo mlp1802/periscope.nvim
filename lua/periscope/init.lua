@@ -17,7 +17,7 @@ end
 local function setup_auto_commands()
 	local augroup = vim.api.nvim_create_augroup("MyPluginGroup", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
-		{ group = augroup, desc = "Set a fennel scratch buffer on load", once = true, callback = main })
+		{ group = augroup, desc = "", once = true, callback = main })
 	--	vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 	--		pattern = { "*.*" },
 	--		group = augroup,
@@ -27,7 +27,7 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
-
+			model().buffer_entered(args.file)
 		end,
 	})
 	vim.api.nvim_create_autocmd({ "BufLeave", "BufWinLeave" }, {
@@ -35,14 +35,6 @@ local function setup_auto_commands()
 		group = augroup,
 		callback = function(args)
 			model().buffer_left(args.file)
-		end,
-	})
-	vim.api.nvim_create_autocmd({ "BufDelete" }, {
-		pattern = { "*.*" },
-		group = augroup,
-		callback = function(args)
-			print("Buffer deleted")
-			--model().buffer_left(args.file)
 		end,
 	})
 end
@@ -115,7 +107,7 @@ function setup(e)
 	setup_user_commands();
 end
 
---setup(true)
+setup(true)
 return {
 	setup = setup,
 	model = model(),

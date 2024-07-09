@@ -194,6 +194,9 @@ end
 
 -- Called when a buffer is entered
 function buffer_entered(path)
+	if not vim.fn.filereadable(path) then
+		return
+	end
 	local current_task = get_current_task()
 	--print("Buffer entered: " .. path)
 	if current_task then
