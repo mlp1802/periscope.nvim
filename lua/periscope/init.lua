@@ -44,11 +44,11 @@ local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeShowTasks', function()
 		pickers().show_all_tasks()
 	end, {})
+	vim.api.nvim_create_user_command('PeriscopeDeleteCurrentTask', function()
+		model().delete_current_task()
+	end, {})
 end
-
-local function setup_shortcuts()
-end
-
+setup = setup_user_commands
 function setup(f)
 	setup_auto_commands();
 	setup_user_commands();

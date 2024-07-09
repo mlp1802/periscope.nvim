@@ -69,6 +69,7 @@ end
 -- Sets the current task
 local function set_current_task(task_id)
 	local workspace = get_current_workspace()
+	print("Setting current task: " .. task_id)
 	workspace.current_task_id = task_id
 	save_workspace()
 end
@@ -109,8 +110,7 @@ end
 -- Gets the current task
 local function get_current_task()
 	local workspace = get_current_workspace()
-	local task_id = workspace.current_task_id
-	return workspace.tasks[task_id]
+	return workspace.tasks[workspace.current_task_id]
 end
 
 local function get_current_task_name()
@@ -197,8 +197,18 @@ local function get_all_tasks()
 	return workspace.tasks
 end
 
-
-
+local function delete_current_task()
+	local workspace = get_current_workspace()
+	local name = get_current_task_name() or "No task"
+	table.remove(workspace.tasks, workspace.current_task_id)
+	workspace.current_task_id = 0
+	save_workspace()
+	print("Task deleted: " .. name)
+end
+local function get_current_task_id()
+	local workspace = get_current_workspace()
+	return workspace.current_task_id
+end
 return {
 	new_task = new_task,
 	buffer_entered = buffer_entered,
@@ -210,5 +220,8 @@ return {
 	get_all_tasks = get_all_tasks,
 	get_current_workspace = get_current_workspace,
 	get_current_task_name = get_current_task_name,
+	delete_current_task = delete_current_task,
+	get_current_task_id = get_current_task_id,
+
 
 }

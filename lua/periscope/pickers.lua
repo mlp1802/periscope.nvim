@@ -74,7 +74,10 @@ local function show_files_for_current_task()
 end
 local function show_all_tasks()
 	--print("NUMBER OF Tasks: " .. #tasks)
-	local current_task_name = model().get_current_task_name() or "(No task selected)";
+	local current_task_name = model().get_current_task_name() or "No task selected";
+
+	local current_task_id = model().get_current_task_id() or 999;
+	print("Current task id: " .. current_task_id)
 
 	local opts = {}
 	local tasks = model().get_all_tasks()
@@ -98,6 +101,7 @@ local function show_all_tasks()
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
+				print("Selecting task " .. selection.value.id)
 				model().set_current_task(selection.value.id)
 			end)
 			return true
