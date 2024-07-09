@@ -27,6 +27,9 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
+			if not enabled then
+				return
+			end
 			model().buffer_entered(args.file)
 		end,
 	})
@@ -34,6 +37,10 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
+			if not enabled then
+				return
+			end
+
 			model().buffer_left(args.file)
 		end,
 	})
