@@ -1,5 +1,3 @@
-local scripts = require('periscope.scripts');
-
 function pickers()
 	return require('periscope.pickers')
 end
@@ -13,6 +11,7 @@ local function main()
 end
 
 local function setup_auto_commands()
+	local augroup = vim.api.nvim_create_augroup("MyPluginGroup", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
 		{ group = augroup, desc = "Set a fennel scratch buffer on load", once = true, callback = main })
 	--	vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
@@ -24,7 +23,14 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
-			require('periscope.model').buffer_entered(args.file)
+			model().buffer_entered(args.file)
+		end,
+	})
+	vim.api.nvim_create_autocmd({ "BufLeave", "BufWinLeave" }, {
+		pattern = { "*.*" },
+		group = augroup,
+		callback = function(args)
+			model().buffer_left(args.file)
 		end,
 	})
 end
@@ -41,17 +47,18 @@ local function setup_user_commands()
 end
 local function setup_shortcuts()
 	vim.api.nvim_set_keymap('n', '<leader>tn', '<cmd>PeriscopeNewTask<cr>', { noremap = true, silent = true })
-	vim.api.nvim_set_keymap('n', '<leader>tr', '<cmd>PeriscopeShowFiles<cr>', { noremap = true, silent = true })
-	vim.api.nvim_set_keymap('n', '<leader>tt', '<cmd>PeriscopeShowTasks<cr>', { noremap = true, silent = true })
+	vim.api.nvim_set_keymap('n', '<leader>tt', '<cmd>PeriscopeShowFiles<cr>', { noremap = true, silent = true })
+	vim.api.nvim_set_keymap('n', '<leader>tr', '<cmd>PeriscopeShowTasks<cr>', { noremap = true, silent = true })
 end
-local function setup()
+function setup_p()
 	setup_auto_commands();
 	setup_user_commands();
 	setup_shortcuts();
 end
-setup();
+
+-- setup();
 return {
-	setup = setup,
+	setup = setup_p,
 	model = model(),
 	pickers = pickers(),
 

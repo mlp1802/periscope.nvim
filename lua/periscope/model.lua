@@ -1,5 +1,4 @@
 local current_workspace = nil
-local script = require('periscope.scripts')
 local START_USAGE = 10
 local function new_file(path)
 	return {
@@ -12,30 +11,80 @@ local function new_workspace()
 	local workspace = {
 		task_id = 0,
 		current_task_id = 0,
-		tasks = {}
+		tasks = {},
+		last_file = ""
+
 	}
 	return workspace
 end
+local function get_project_directory()
+	return vim.fn.getcwd() -- Gets the current working directory
+end
 
+local function get_workspace_file_path()
+	return get_project_directory() .. "/.periscope.nvim.json"
+end
+
+local function load_workspace()
+	local workspace_file_path = get_workspace_file_path()
+	local file = io.open(workspace_file_path, "r")
+	if file then
+		local json_data = file:read("*a")
+		file:close()
+		local status, workspace_data = pcall(vim.fn.json_decode, json_data)
+		if status then
+			current_workspace = workspace_data
+			print("Workspace loaded from " .. workspace_file_path)
+		else
+			print("Error parsing workspace file: " .. workspace_file_path)
+			-- Optionally, you can also delete the corrupted file or take some other action
+		end
+	else
+		print("No workspace file found at " .. workspace_file_path)
+		current_workspace = new_workspace()
+	end
+end
 --Gets  or creates a new workspace
 local function get_current_workspace()
 	if current_workspace == nil then
-		current_workspace = new_workspace()
+		print("Creating new workspace")
+		load_workspace()
 	end
 	return current_workspace
 end
+local function save_workspace()
+	local workspace = get_current_workspace()
+	local workspace_file_path = get_workspace_file_path()
+	local json_data = vim.fn.json_encode(workspace)
+	local file = io.open(workspace_file_path, "w")
+	if file then
+		file:write(json_data)
+		file:close()
+		--print("Workspace saved to " .. workspace_file_path)
+	else
+		print("Error saving workspace to " .. workspace_file_path)
+	end
+end
+
+
+
+
+
 
 -- Sets the current task
 local function set_current_task(task_id)
 	local workspace = get_current_workspace()
 	workspace.current_task_id = task_id
+	save_workspace()
 end
 
 -- Creates a new task and adds it to the workspace
 local function create_task(name)
+	print("Creating task: " .. name)
 	local workspace = get_current_workspace()
-	local task_id = workspace.task_id
 	workspace.task_id = workspace.task_id + 1
+
+	local task_id = workspace.task_id;
 	local task = {
 		id = task_id,
 		name = name,
@@ -43,9 +92,13 @@ local function create_task(name)
 
 	}
 	table.insert(workspace.tasks, task);
+	print("number of tasks: " .. #workspace.tasks)
 	set_current_task(task_id);
 	print("Task created: " .. name)
 end
+
+
+
 
 -- Creates a new task, promts user for a name
 local function new_task()
@@ -65,7 +118,14 @@ local function get_current_task()
 	return workspace.tasks[task_id]
 end
 
-
+local function get_current_task_name()
+	local task = get_current_task()
+	if task then
+		return task.name
+	else
+		return nil
+	end
+end
 -- Shows files for the current task
 
 -- Removes a file from the current task
@@ -85,7 +145,7 @@ end
 local function add_file_to_current_task(path)
 	local task = get_current_task()
 	if task then
-		print("ADDING FILE TO CURRENT TASK")
+		print("ADDING FILE TO CURRENT TASK .." .. path)
 		remove_file_from_current_task(path)
 		local file = new_file(path)
 		table.insert(task.files, file)
@@ -99,6 +159,7 @@ local function downgrade_files(task)
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
+			print("Removing file from task: " .. file.path)
 			table.remove(task.files, i)
 		end
 	end
@@ -107,11 +168,34 @@ end
 -- Called when a buffer is entered
 local function buffer_entered(path)
 	local current_task = get_current_task()
+	print("Buffer entered: " .. path)
 	if current_task then
-		add_file_to_current_task(path)
 		downgrade_files(current_task)
+		add_file_to_current_task(path)
+		save_workspace()
 	end
 end
+local function get_file_for_current_task(path)
+	local task = get_current_task()
+	if task then
+		for i, file in ipairs(task.files) do
+			if file.path == path then
+				return file
+			end
+		end
+	end
+	return nil
+end
+-- Called when a buffer is left
+local function buffer_left(path)
+	local left_file = get_file_for_current_task(path)
+	if left_file then
+		print("Buffer recently_left left: " .. path)
+		get_current_workspace().last_file = path
+		save_workspace()
+	end
+end
+
 
 local function get_all_tasks()
 	local workspace = get_current_workspace()
@@ -119,19 +203,17 @@ local function get_all_tasks()
 end
 
 
-local function get_all_files_for_current_task()
-	local task = get_current_task()
-	return task.files
-end
---Test
 
 return {
 	new_task = new_task,
 	buffer_entered = buffer_entered,
+	buffer_left = buffer_left,
 	get_current_task = get_current_task,
 	set_current_task = set_current_task,
 	create_task = create_task,
 	add_file_to_current_task = add_file_to_current_task,
 	get_all_tasks = get_all_tasks,
+	get_current_workspace = get_current_workspace,
+	get_current_task_name = get_current_task_name,
 
 }
