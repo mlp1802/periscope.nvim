@@ -1,12 +1,16 @@
-local telescope = require('telescope');
 local scripts = require('periscope.scripts');
-local model = require('periscope.model');
-local pickers = require('periscope.pickers');
+
+function pickers()
+	return require('periscope.pickers')
+end
+
+function model()
+	return require('periscope.model')
+end
+
 local function main()
 	print("Hello from our plugin")
 end
-
-
 
 local function setup_auto_commands()
 	vim.api.nvim_create_autocmd("VimEnter",
@@ -20,19 +24,19 @@ local function setup_auto_commands()
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
-			model.buffer_entered(args.file)
+			require('periscope.model').buffer_entered(args.file)
 		end,
 	})
 end
 local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeNewTask', function()
-		model.new_task("New Task")
+		model().new_task()
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeShowFiles', function()
-		pickers.show_files_for_current_task()
+		pickers().show_files_for_current_task()
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeShowTasks', function()
-		pickers.show_all_tasks()
+		pickers().show_all_tasks()
 	end, {})
 end
 local function setup_shortcuts()
@@ -48,8 +52,8 @@ end
 setup();
 return {
 	setup = setup,
-	model = model,
-	pickers = pickers,
+	model = model(),
+	pickers = pickers(),
 
 
 }

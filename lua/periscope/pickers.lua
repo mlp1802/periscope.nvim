@@ -49,7 +49,7 @@ local function show_all_tasks()
 	local tasks = model.get_all_tasks()
 	local opts = {}
 	pickers.new(opts, {
-		prompt_title = "All tasks",
+		prompt_title = "All tasks ol29",
 		finder = finders.new_table {
 			results = tasks,
 			entry_maker = function(entry)
@@ -74,9 +74,9 @@ local function show_all_tasks()
 	}):find()
 end
 
-model.create_task("SKOD 1");
-model.create_task("SKOD 2");
-show_all_tasks();
+--model.create_task("SKOD 1");
+--model.create_task("SKOD 2");
+--show_all_tasks();
 --model.add_file_to_current_task("test.lua")
 --show_files_for_current_task()
 
