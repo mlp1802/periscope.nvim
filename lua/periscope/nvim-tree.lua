@@ -46,10 +46,11 @@ local function unfilter_tree()
 	filter.custom_function = nil --prev_filter_function
 	tree.reload()
 end
-filter_tree()
+--filter_tree()
 --local dir = vim.fn.getcwd();
 --tree.open({ path = dir });
 
 return {
-	filter_nvim_tree_nodes = filter_nvim_tree_nodes
+	filter_tree = filter_tree,
+	unfilter_tree = unfilter_tree,
 }
