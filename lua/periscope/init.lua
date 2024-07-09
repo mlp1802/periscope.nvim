@@ -23,7 +23,7 @@ local function setup_auto_commands()
 	--		group = augroup,
 	--		callback = file_entered
 	--	});
-	vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+	vim.api.nvim_create_autocmd({ "BufEnter" }, {
 		pattern = { "*.*" },
 		group = augroup,
 		callback = function(args)
