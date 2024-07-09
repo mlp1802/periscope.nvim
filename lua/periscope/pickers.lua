@@ -3,6 +3,9 @@ local actions = require('telescope.actions')
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
+local function nvim_tree()
+	return require('periscope.nvim-tree')
+end
 function model()
 	return require('periscope.model')
 end
@@ -103,6 +106,7 @@ local function show_all_tasks()
 				local selection = action_state.get_selected_entry()
 				print("Selecting task " .. selection.value.id)
 				model().set_current_task(selection.value.id)
+				nvim_tree().filter_tree()
 			end)
 			return true
 		end,

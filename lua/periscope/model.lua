@@ -3,6 +3,7 @@ local nvim_tree = require('periscope.nvim-tree')
 local current_workspace = nil
 local START_USAGE = 20
 local lume_e = require('periscope.lume_extra')
+local nvim_tree = require('periscope.nvim-tree')
 local function new_file(path)
 	return {
 		path = path,
@@ -92,6 +93,7 @@ local function create_task(name)
 	}
 	workspace.task = lume.push(workspace.tasks, task)
 	set_current_task(task_id);
+	nvim_tree.filter_tree()
 end
 
 
@@ -214,12 +216,17 @@ end
 
 -- Deletes the current taskæ
 local function delete_current_task()
-	local workspace = get_current_workspace()
-	workspace.tasks = lume.filter(workspace.tasks, function(task)
-		return task.id ~= workspace.current_task_id
-	end)
-	workspace.current_task_id = nil
-	save_workspace()
+	local confirm = vim.fn.confirm("Delete task?", "&Yes\n&No", 2)
+	if confirm == 1 then
+		local workspace = get_current_workspace()
+		workspace.tasks = lume.filter(workspace.tasks, function(task)
+			return task.id ~= workspace.current_task_id
+		end)
+		workspace.current_task_id = nil
+		save_workspace()
+		nvim_tree.unfilter_tree()
+		print("Task deleted")
+	end
 end
 -- Gets the current task id
 local function get_current_task_id()
