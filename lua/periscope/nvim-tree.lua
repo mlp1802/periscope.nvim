@@ -39,9 +39,10 @@ local function filter_tree()
 		return true -- Exclude everything else
 	end
 	--filter.custom_function = nil
-	tree.open()
+	--tree.open()
+
+	tree.expand_all()
 	tree.reload() -- This applies the filter
-	--tree.expand_all()
 end
 local function unfilter_tree()
 	filter.custom_function = nil --prev_filter_function
@@ -49,7 +50,7 @@ local function unfilter_tree()
 end
 --local dir = vim.fn.getcwd();
 --tree.open({ path = dir });
-
+--filter_tree()
 return {
 	filter_tree = filter_tree,
 	unfilter_tree = unfilter_tree,
