@@ -1,4 +1,4 @@
-require('periscope.lume')
+local lume = require('periscope.lume')
 local current_workspace = nil
 local START_USAGE = 20
 
@@ -78,7 +78,6 @@ end
 
 -- Creates a new task and adds it to the workspace
 local function create_task(name)
-	--print("Creating task: " .. name)
 	local workspace = get_current_workspace()
 	workspace.task_id = workspace.task_id + 1
 	local task_id = workspace.task_id;
@@ -88,10 +87,8 @@ local function create_task(name)
 		files = {}
 
 	}
-	workspace.tasks[task_id] = task
-	--print("number of tasks: " .. #workspace.tasks)
+	workspace.task = lume.push(workspace.tasks, task)
 	set_current_task(task_id);
-	--print("Task created: " .. name)
 end
 
 
@@ -111,7 +108,10 @@ end
 -- Gets the current task
 local function get_current_task()
 	local workspace = get_current_workspace()
-	return workspace.tasks[workspace.current_task_id]
+	local task = lume.filter(workspace.tasks, function(task)
+		return task.id == workspace.current_task_id
+	end)
+	return lume.first(task)
 end
 
 local function get_current_task_name()
@@ -140,12 +140,11 @@ end
 local function add_file_to_current_task(path)
 	local task = get_current_task()
 	if task then
-		--print("ADDING FILE TO CURRENT TASK .." .. path)
 		remove_file_from_current_task(path)
 		local file = new_file(path)
 		table.insert(task.files, file)
 	else
-		--print("CANNOT ADD FILE TO CURRENT TASK")
+		print("Cannot add file to current task")
 	end
 end
 
@@ -154,7 +153,6 @@ local function downgrade_files(task)
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
-			--print("Removing file from task: " .. file.path)
 			table.remove(task.files, i)
 		end
 	end
@@ -192,19 +190,22 @@ local function buffer_left(path)
 end
 
 
+-- Gets all tasks
 local function get_all_tasks()
 	local workspace = get_current_workspace()
 	return workspace.tasks
 end
 
+-- Deletes the current taskæ
 local function delete_current_task()
 	local workspace = get_current_workspace()
-	local name = get_current_task_name() or "No task"
-	workspace.tasks[workspace.current_task_id] = nil
+	workspace.tasks = lume.filter(workspace.tasks, function(task)
+		return task.id ~= workspace.current_task_id
+	end)
 	workspace.current_task_id = nil
 	save_workspace()
-	print("Task deleted: " .. name)
 end
+-- Gets the current task id
 local function get_current_task_id()
 	local workspace = get_current_workspace()
 	return workspace.current_task_id
