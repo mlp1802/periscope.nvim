@@ -101,6 +101,13 @@ local function setup_user_commands()
 			print("Periscope is not enabled")
 		end
 	end, {})
+	vim.api.nvim_create_user_command('PeriscopeRenameCurrentTask', function()
+		if enabled then
+			model().rename_current_task()
+		else
+			print("Periscope is not enabled")
+		end
+	end, {})
 end
 function setup(e)
 	enabled = e
@@ -108,7 +115,7 @@ function setup(e)
 	setup_user_commands();
 end
 
-setup(true)
+--setup(true)
 return {
 	setup = setup,
 	model = model(),

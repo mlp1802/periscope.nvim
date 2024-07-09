@@ -6,7 +6,7 @@ local lume_e = require('periscope.lume_extra')
 local nvim_tree = require('periscope.nvim-tree')
 
 --Forward declarations
-local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id
+local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task
 local function new_file(path)
 	return {
 		path = path,
@@ -100,6 +100,22 @@ function create_task(name)
 	--add current file to task
 	buffer_entered(vim.api.nvim_buf_get_name(0))
 	nvim_tree.filter_tree()
+end
+
+-- Creates a new task, promts user for a name
+function rename_current_task()
+	local current_task = get_current_task()
+	if current_task then
+		vim.ui.input({ prompt = 'Rename task:', default = current_task.name }, function(input)
+			if input then
+				current_task.name = input
+				save_workspace()
+			else
+			end
+		end)
+	else
+		print("No current task to rename")
+	end
 end
 
 -- Creates a new task, promts user for a name
@@ -251,6 +267,7 @@ return {
 	get_current_task_name = get_current_task_name,
 	delete_current_task = delete_current_task,
 	get_current_task_id = get_current_task_id,
+	rename_current_task = rename_current_task
 
 
 }

@@ -47,7 +47,6 @@ local function unfilter_tree()
 	filter.custom_function = nil --prev_filter_function
 	tree.reload()
 end
-filter_tree()
 --local dir = vim.fn.getcwd();
 --tree.open({ path = dir });
 
