@@ -45,20 +45,17 @@ local function setup_user_commands()
 		pickers().show_all_tasks()
 	end, {})
 end
+
 local function setup_shortcuts()
-	vim.api.nvim_set_keymap('n', '<leader>tn', '<cmd>PeriscopeNewTask<cr>', { noremap = true, silent = true })
-	vim.api.nvim_set_keymap('n', '<leader>tt', '<cmd>PeriscopeShowFiles<cr>', { noremap = true, silent = true })
-	vim.api.nvim_set_keymap('n', '<leader>tr', '<cmd>PeriscopeShowTasks<cr>', { noremap = true, silent = true })
-end
-function setup_p()
-	setup_auto_commands();
-	setup_user_commands();
-	setup_shortcuts();
 end
 
--- setup();
+function setup(f)
+	setup_auto_commands();
+	setup_user_commands();
+end
+
 return {
-	setup = setup_p,
+	setup = setup,
 	model = model(),
 	pickers = pickers(),
 
