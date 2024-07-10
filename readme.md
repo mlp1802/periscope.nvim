@@ -24,7 +24,7 @@ return {
 		{ "nvim-tree/nvim-tree.lua" }, { "nvim-telescope/telescope.nvim" },
 	},
 	config = function()
-		require('periscope').setup(true)
+		require('periscope').setup(true) --set to false if you don't want Periscope to start on startup
 	end
 }
 ```
