@@ -42,13 +42,9 @@ function load_workspace()
 		local status, workspace_data = pcall(vim.fn.json_decode, json_data)
 		if status then
 			current_workspace = workspace_data
-			--print("Workspace loaded from " .. workspace_file_path)
 		else
-			--print("Error parsing workspace file: " .. workspace_file_path)
-			-- Optionally, you can also delete the corrupted file or take some other action
 		end
 	else
-		--print("No workspace file found at " .. workspace_file_path)
 		current_workspace = new_workspace()
 	end
 end
@@ -145,6 +141,7 @@ function get_current_task_name()
 	end
 end
 
+-- Removes files that have been deleted from the current task
 function remove_files_from_current_tasks()
 	local current_task = get_current_task()
 	if current_task == nil then

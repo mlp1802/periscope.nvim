@@ -18,11 +18,7 @@ local function setup_auto_commands()
 	local augroup = vim.api.nvim_create_augroup("MyPluginGroup", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
 		{ group = augroup, desc = "", once = true, callback = main })
-	--	vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-	--		pattern = { "*.*" },
-	--		group = augroup,
-	--		callback = file_entered
-	--	});
+
 	vim.api.nvim_create_autocmd({ "BufEnter" }, {
 		pattern = { "*.*" },
 		group = augroup,

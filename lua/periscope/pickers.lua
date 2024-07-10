@@ -32,8 +32,8 @@ local function file_sorter()
 	}
 end
 
+-- and attemp to sort by string, will change..
 local function get_string_numeric_value(str)
-	--return value
 	local str = str:lower()
 	local value = 0
 	local factor = 1
@@ -60,8 +60,6 @@ local function show_files_for_current_task()
 		return
 	end
 	local opts = {}
-
-
 	pickers.new(opts, {
 		prompt_title = task.name .. ": files",
 		finder = finders.new_table {
@@ -74,7 +72,6 @@ local function show_files_for_current_task()
 				}
 			end,
 		},
-		--sorter = conf.generic_sorter(opts),
 		sorter = file_sorter(),
 		attach_mappings = function(prompt_bufnr, map)
 			actions.select_default:replace(function()
@@ -87,11 +84,8 @@ local function show_files_for_current_task()
 	}):find()
 end
 local function show_all_tasks()
-	--print("NUMBER OF Tasks: " .. #tasks)
 	local current_task_name = model().get_current_task_name() or "No task selected";
 	local current_task_id = model().get_current_task_id() or 999;
-	print("Current task id: " .. current_task_id)
-
 	local opts = {}
 	local tasks = model().get_all_tasks()
 	pickers.new(opts, {
@@ -106,15 +100,12 @@ local function show_all_tasks()
 				}
 			end,
 		},
-		--sorter = conf.generic_sorter(opts),
-		--sorter = sorters.get_fuzzy_file(),
-		--sorting_strategy = "ascending",
+		strategy = "ascending",
 		sorter = task_sorter(),
 		attach_mappings = function(prompt_bufnr, map)
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
-				print("Selecting task " .. selection.value.id)
 				model().set_current_task(selection.value.id)
 				nvim_tree().filter_tree()
 			end)
@@ -122,13 +113,6 @@ local function show_all_tasks()
 		end,
 	}):find()
 end
-
---model.create_task("SKOD 1");
---model.create_task("SKOD 2");
---show_all_tasks();
---model.add_file_to_current_task("test.lua")
---show_files_for_current_task()
-
 return {
 	show_files_for_current_task = show_files_for_current_task,
 	show_all_tasks = show_all_tasks,
