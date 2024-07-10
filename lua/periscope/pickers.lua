@@ -81,7 +81,6 @@ local function show_all_tasks()
 				}
 			end,
 		},
-		strategy = "ascending",
 		sorter = conf.generic_sorter({}),
 
 		attach_mappings = function(prompt_bufnr, map)
