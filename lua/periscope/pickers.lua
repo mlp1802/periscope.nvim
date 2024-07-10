@@ -32,26 +32,6 @@ local function file_sorter()
 	}
 end
 
--- and attemp to sort by string, will change..
-local function get_string_numeric_value(str)
-	local str = str:lower()
-	local value = 0
-	local factor = 1
-	for i = 1, #str do
-		value = value + string.byte(str, i) * factor
-		factor = factor * 256
-	end
-	return value
-end
-local function task_sorter()
-	return sorters.Sorter:new {
-		scoring_function = function(_, prompt, ordinal, entry)
-			return get_string_numeric_value(entry.value.name)
-		end,
-	}
-end
-
-
 local function show_files_for_current_task()
 	model().remove_deleted_files_from_current_tasks()
 	local task = model().get_current_task()
@@ -83,6 +63,7 @@ local function show_files_for_current_task()
 		end,
 	}):find()
 end
+
 local function show_all_tasks()
 	local current_task_name = model().get_current_task_name() or "No task selected";
 	local current_task_id = model().get_current_task_id() or 999;
@@ -101,7 +82,8 @@ local function show_all_tasks()
 			end,
 		},
 		strategy = "ascending",
-		sorter = task_sorter(),
+		sorter = conf.generic_sorter({}),
+
 		attach_mappings = function(prompt_bufnr, map)
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
