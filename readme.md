@@ -30,15 +30,15 @@ return {
 ```
 
 ## Commands
-- `:PeriscopeEnable` - enable Periscope
-- `:PeriscopeDisable` - disable Periscope
-- `:PeriscopeFilterTree` - filters the tree (default behavior)
-- `:PeriscopeUnfilterTree` - unfilter tree (default behavior)
-- `:PeriscopeNewTask` - creates a new task
-- `:PeriscopeDeleteCurrentTask` - deletes the current task
-- `:PeriscopeRenameCurrentTask` - renames the current task
-- `:PeriscopeShowFiles` - opens a file selector for files associated with the current task
-- `:PeriscopeShowTasks` - opens a file selector for files associated with the current task
+- `:PeriscopeEnable` - Enable Periscope
+- `:PeriscopeDisable` - Disable Periscope
+- `:PeriscopeFilterTree` - Filters the tree (default behavior)
+- `:PeriscopeUnfilterTree` - Unfilter tree 
+- `:PeriscopeNewTask` - Creates a new task
+- `:PeriscopeDeleteCurrentTask` - Deletes the current task
+- `:PeriscopeRenameCurrentTask` - Renames the current task
+- `:PeriscopeShowFiles` - Opens a file selector for files associated with the current task
+- `:PeriscopeShowTasks` - Opens a task selector
 
 Note, this is my first plugin, so there might be some bugs. Please report them if you find any.
 
