@@ -18,13 +18,13 @@ Point is, as soon as you have selected a file, it will be added to the task and 
 
 ```lua
 return {
-	"mlp1802/periscope.nvim"
+	"mlp1802/periscope.nvim",
 	name = "periscope",
 	dependencies = {
-		{ "nvim-tree" }, { "telescope" },
+		{ "nvim-tree/nvim-tree.lua" }, { "nvim-telescope/telescope.nvim" },
 	},
 	config = function()
-		require('periscope').setup(true) --set to false if you don't want perisoce to start on vim startup
+		require('periscope').setup(true)
 	end
 }
 ```

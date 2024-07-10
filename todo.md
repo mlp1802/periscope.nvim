@@ -1,3 +1,3 @@
 ## Todo
-- [ ] Check for dependencie, nvim-tree and telescope 
+- [1] Check for dependencie, nvim-tree and telescope 
 - [ ] Set default filter again when unfiltering
