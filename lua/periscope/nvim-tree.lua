@@ -18,10 +18,8 @@ local set_filter_enabled, filter_tree, unfilter_tree
 function set_filter_enabled(_enable)
 	enabled = _enable
 	if enabled then
-		print("Periscope filter enabled")
 		filter_tree()
 	else
-		print("Periscope filter disabled")
 		unfilter_tree()
 	end
 end

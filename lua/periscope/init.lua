@@ -15,7 +15,7 @@ local function main()
 end
 
 local function setup_auto_commands()
-	local augroup = vim.api.nvim_create_augroup("MyPluginGroup", { clear = true })
+	local augroup = vim.api.nvim_create_augroup("Periscope", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
 		{ group = augroup, desc = "", once = true, callback = main })
 
@@ -85,6 +85,7 @@ local function setup_user_commands()
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeEnableFilter', function()
 		if enabled then
+			print("Periscope filter enabled")
 			nvimtree().set_filter_enabled(true)
 		else
 			print("Periscope is not enabled")
@@ -92,6 +93,7 @@ local function setup_user_commands()
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeDisableFilter', function()
 		if enabled then
+			print("Periscope filter disable")
 			nvimtree().set_filter_enabled(false)
 		else
 			print("Periscope is not enabled")
