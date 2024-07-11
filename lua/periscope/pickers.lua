@@ -3,6 +3,7 @@ local actions = require('telescope.actions')
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
+local utils = require('periscope.utils')
 local function nvim_tree()
 	return require('periscope.nvim-tree')
 end
@@ -47,7 +48,7 @@ local function show_files_for_current_task()
 			entry_maker = function(entry)
 				return {
 					value = entry,
-					display = entry.path,
+					display = entry.path, --.. " : " .. entry.usage,
 					ordinal = entry.path,
 				}
 			end,
@@ -57,7 +58,8 @@ local function show_files_for_current_task()
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
-				vim.cmd("edit " .. selection.value.path)
+				local path = utils.to_absolute_path(selection.value.path)
+				vim.cmd("edit " .. path)
 			end)
 			return true
 		end,

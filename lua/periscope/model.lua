@@ -1,10 +1,9 @@
 local lume = require('periscope.lume')
 local nvim_tree = require('periscope.nvim-tree')
+local lume_e = require('periscope.lume_extra')
+local utils = require('periscope.utils')
 local current_workspace = nil
 local START_USAGE = 60
-local lume_e = require('periscope.lume_extra')
-local nvim_tree = require('periscope.nvim-tree')
-
 --Forward declarations
 local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task
 local function new_file(path)
@@ -52,7 +51,6 @@ end
 --Gets  or creates a new workspace
 function get_current_workspace()
 	if current_workspace == nil then
-		--print("Creating new workspace")
 		load_workspace()
 	end
 	return current_workspace
@@ -168,6 +166,7 @@ end
 
 -- Adds a file to the current task
 function add_file_to_current_task(path)
+	--print("Adding file to current task: " .. to_relative_path(path))
 	local task = get_current_task()
 	if task then
 		remove_file_from_current_task(path)
@@ -188,21 +187,6 @@ function downgrade_files(task)
 	end
 end
 
--- Called when a buffer is entered
-function buffer_entered(path)
-	if not vim.fn.filereadable(path) then
-		return
-	end
-	local current_task = get_current_task()
-	--print("Buffer entered: " .. path)
-	if current_task then
-		downgrade_files(current_task)
-		add_file_to_current_task(path)
-		save_workspace()
-		nvim_tree.filter_tree()
-	end
-end
-
 function get_file_for_current_task(path)
 	local task = get_current_task()
 	if task then
@@ -215,8 +199,25 @@ function get_file_for_current_task(path)
 	return nil
 end
 
+-- Called when a buffer is entered
+function buffer_entered(path)
+	if not vim.fn.filereadable(path) then
+		return
+	end
+	local path = utils.to_relative_path(path)
+	local current_task = get_current_task()
+	--print("Buffer entered: " .. path)
+	if current_task then
+		downgrade_files(current_task)
+		add_file_to_current_task(path)
+		save_workspace()
+		nvim_tree.filter_tree()
+	end
+end
+
 -- Called when a buffer is left
 function buffer_left(path)
+	local path = utils.to_relative_path(path)
 	local left_file = get_file_for_current_task(path)
 	if left_file then
 		--print("Buffer recently_left left: " .. path)
