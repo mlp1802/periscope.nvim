@@ -95,7 +95,6 @@ function create_task(name)
 	set_current_task(task_id);
 	--add current file to task
 	buffer_entered(vim.api.nvim_buf_get_name(0))
-	nvim_tree.filter_tree()
 end
 
 -- Creates a new task, promts user for a name

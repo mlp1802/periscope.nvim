@@ -66,7 +66,6 @@ end
 
 local function show_all_tasks()
 	local current_task_name = model().get_current_task_name() or "No task selected";
-	local current_task_id = model().get_current_task_id() or 999;
 	local opts = {}
 	local tasks = model().get_all_tasks()
 	pickers.new(opts, {
@@ -82,13 +81,12 @@ local function show_all_tasks()
 			end,
 		},
 		sorter = conf.generic_sorter({}),
-
 		attach_mappings = function(prompt_bufnr, map)
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
 				model().set_current_task(selection.value.id)
-				nvim_tree().filter_tree()
+				nvim_tree().set_filter_enabled(true)
 			end)
 			return true
 		end,

@@ -45,6 +45,7 @@ local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeNewTask', function()
 		if enabled then
 			model().new_task()
+			nvimtree().set_filter_enabled(true)
 		else
 			print("Periscope is not enabled")
 		end
@@ -52,7 +53,7 @@ local function setup_user_commands()
 	vim.api.nvim_create_user_command('PeriscopeEnable', function()
 		enabled = true
 		print("Periscope enabled")
-		nvimtree().filter_tree()
+		nvimtree().set_filter_enabled(true)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeDisable', function()
 		enabled = false
@@ -82,16 +83,16 @@ local function setup_user_commands()
 			print("Periscope is not enabled")
 		end
 	end, {})
-	vim.api.nvim_create_user_command('PeriscopeFilterTree', function()
+	vim.api.nvim_create_user_command('PeriscopeEnableFilter', function()
 		if enabled then
-			nvimtree().filter_tree()
+			nvimtree().set_filter_enabled(true)
 		else
 			print("Periscope is not enabled")
 		end
 	end, {})
-	vim.api.nvim_create_user_command('PeriscopeUnfilterTree', function()
+	vim.api.nvim_create_user_command('PeriscopeDisableFilter', function()
 		if enabled then
-			nvimtree().unfilter_tree()
+			nvimtree().set_filter_enabled(false)
 		else
 			print("Periscope is not enabled")
 		end
@@ -104,8 +105,9 @@ local function setup_user_commands()
 		end
 	end, {})
 end
-function setup(e)
-	enabled = e
+function setup(enabled)
+	enabled = enabled
+	nvimtree().set_filter_enabled(enabled)
 	setup_auto_commands();
 	setup_user_commands();
 end
