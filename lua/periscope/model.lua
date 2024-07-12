@@ -2,10 +2,11 @@ local lume = require('periscope.lume')
 local nvim_tree = require('periscope.nvim-tree')
 local lume_e = require('periscope.lume_extra')
 local utils = require('periscope.utils')
+local script = require('periscope.scripts')
 local current_workspace = nil
 local START_USAGE = 60
 --Forward declarations
-local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task
+local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task, copy_current_task
 local function new_file(path)
 	return {
 		path = path,
@@ -78,6 +79,13 @@ function set_current_task(task_id)
 	save_workspace()
 end
 
+-- Appends a task to the workspace
+function append_task(task)
+	local workspace = get_current_workspace()
+	workspace.task = lume.push(workspace.tasks, task)
+	save_workspace()
+end
+
 -- Creates a new task and adds it to the workspace
 function create_task(name)
 	local workspace = get_current_workspace()
@@ -89,10 +97,32 @@ function create_task(name)
 		files = {}
 
 	}
-	workspace.task = lume.push(workspace.tasks, task)
+	append_task(task)
 	set_current_task(task_id);
 	--add current file to task
-	buffer_entered(vim.api.nvim_buf_get_name(0))
+	--buffer_entered(vim.api.nvim_buf_get_name(0))
+end
+
+---- Creates a new task, promts user for a name
+function copy_current_task()
+	local current_task = get_current_task()
+	if current_task then
+		vim.ui.input({ prompt = 'Rename task:', default = current_task.name }, function(input)
+			if input then
+				local workspace = get_current_workspace()
+				workspace.task_id = workspace.task_id + 1
+				local new_task = script.deepcopy(current_task)
+				new_task.name = input
+				new_task.id = workspace.task_id
+				append_task(new_task)
+				save_workspace()
+				nvimtree().filter_tree()
+			else
+			end
+		end)
+	else
+		print("No current task to rename")
+	end
 end
 
 -- Creates a new task, promts user for a name
@@ -116,6 +146,7 @@ function new_task()
 	vim.ui.input({ prompt = 'Enter task name: ' }, function(input)
 		if input then
 			create_task(input)
+			nvim_tree.set_filter_enabled(true)
 		else
 		end
 	end)
@@ -272,7 +303,10 @@ return {
 	get_current_task_name = get_current_task_name,
 	delete_current_task = delete_current_task,
 	get_current_task_id = get_current_task_id,
-	rename_current_task = rename_current_task
+	rename_current_task = rename_current_task,
+	copy_current_task = copy_current_task
+
+
 
 
 }
