@@ -13,7 +13,16 @@ end
 
 local function main()
 end
+--forward declarations
+local setup_auto_commands, setup_user_commands, setup, run
 
+local function run(f)
+	if enabled then
+		f()
+	else
+		print("Periscope is not enabled")
+	end
+end
 local function setup_auto_commands()
 	local augroup = vim.api.nvim_create_augroup("Periscope", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
@@ -42,13 +51,16 @@ local function setup_auto_commands()
 	})
 end
 local function setup_user_commands()
+	vim.api.nvim_create_user_command('PeriscopeCopyCurrentTask', function()
+		run(function()
+			model().copy_current_task()
+		end)
+	end, {})
+
 	vim.api.nvim_create_user_command('PeriscopeNewTask', function()
-		if enabled then
+		run(function()
 			model().new_task()
-			nvimtree().set_filter_enabled(true)
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeEnable', function()
 		enabled = true
@@ -63,48 +75,34 @@ local function setup_user_commands()
 
 
 	vim.api.nvim_create_user_command('PeriscopeShowFiles', function()
-		if enabled then
+		run(function()
 			pickers().show_files_for_current_task()
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeShowTasks', function()
-		if enabled then
+		run(function()
 			pickers().show_all_tasks()
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeDeleteCurrentTask', function()
-		if enabled then
+		run(function()
 			model().delete_current_task()
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeEnableFilter', function()
-		if enabled then
-			print("Periscope filter enabled")
+		run(function()
 			nvimtree().set_filter_enabled(true)
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeDisableFilter', function()
-		if enabled then
-			print("Periscope filter disable")
+		run(function()
 			nvimtree().set_filter_enabled(false)
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 	vim.api.nvim_create_user_command('PeriscopeRenameCurrentTask', function()
-		if enabled then
+		run(function()
 			model().rename_current_task()
-		else
-			print("Periscope is not enabled")
-		end
+		end)
 	end, {})
 end
 function setup(enabled)

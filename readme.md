@@ -42,4 +42,6 @@ return {
 
 Note, this is my first plugin, so there might be some bugs. Please report them if you find any.
 
+Tasks are saved in ${pwd}/.periscope.nvim.json
+
 
