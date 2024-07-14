@@ -112,7 +112,7 @@ function setup(enabled)
 	setup_user_commands();
 end
 
-setup(true)
+--setup(true)
 return {
 	setup = setup,
 	model = model(),

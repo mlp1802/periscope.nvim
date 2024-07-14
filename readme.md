@@ -37,6 +37,7 @@ return {
 - `:PeriscopeNewTask` - Creates a new task
 - `:PeriscopeDeleteCurrentTask` - Deletes the current task
 - `:PeriscopeRenameCurrentTask` - Renames the current task
+- `:PeriscopeCopyCurrentTask` - Makes a copy of the current task
 - `:PeriscopeShowFiles` - Opens a file selector for files associated with the current task
 - `:PeriscopeShowTasks` - Opens a task selector
 

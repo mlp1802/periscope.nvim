@@ -24,6 +24,29 @@ function set_filter_enabled(_enable)
 	end
 end
 
+local function debounce(func, timeout)
+	local timer_id = nil
+	return function(...)
+		local args = { ... }
+		if timer_id then
+			vim.loop.timer_stop(timer_id)
+			vim.loop.close(timer_id)
+		end
+		timer_id = vim.loop.new_timer()
+		timer_id:start(timeout, 0, vim.schedule_wrap(function()
+			func(unpack(args))
+		end))
+	end
+end
+
+-- Reload the tree with the current filter
+local function tree_reload()
+	tree.expand_all()
+	tree.reload() -- This applies the filter
+end
+
+-- wait 300ms before reloading the tree
+local debounced_tree_reload = debounce(tree_reload, 300) -- Adjust timeout as needed
 function filter_tree()
 	if enabled then
 		filter.custom_function = function(file_or_dir)
@@ -54,8 +77,7 @@ function filter_tree()
 		--filter.custom_function = nil
 		--tree.open()
 
-		tree.expand_all()
-		tree.reload() -- This applies the filter
+		debounced_tree_reload()
 	end
 end
 
