@@ -27,7 +27,13 @@ local function setup_auto_commands()
 	local augroup = vim.api.nvim_create_augroup("Periscope", { clear = true })
 	vim.api.nvim_create_autocmd("VimEnter",
 		{ group = augroup, desc = "", once = true, callback = main })
-
+	local api = require('nvim-tree.api')
+	api.events.subscribe(api.events.Event.FileCreated, function(event)
+		if not enabled then
+			return
+		end
+		model().buffer_entered(event.fname)
+	end)
 	vim.api.nvim_create_autocmd({ "BufEnter" }, {
 		pattern = { "*.*" },
 		group = augroup,
@@ -112,7 +118,7 @@ function setup(enabled)
 	setup_user_commands();
 end
 
---setup(true)
+setup(true)
 return {
 	setup = setup,
 	model = model(),
