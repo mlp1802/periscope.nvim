@@ -107,7 +107,7 @@ end
 function copy_current_task()
 	local current_task = get_current_task()
 	if current_task then
-		vim.ui.input({ prompt = 'Rename task:', default = current_task.name }, function(input)
+		vim.ui.input({ prompt = 'New task name:', default = current_task.name }, function(input)
 			if input then
 				local workspace = get_current_workspace()
 				workspace.task_id = workspace.task_id + 1
