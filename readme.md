@@ -38,7 +38,8 @@ return {
 - `:PeriscopeDeleteCurrentTask` - Deletes the current task
 - `:PeriscopeRenameCurrentTask` - Renames the current task
 - `:PeriscopeCopyCurrentTask` - Makes a copy of the current task
-- `:PeriscopeShowFiles` - Opens a file selector for files associated with the current task
+- `:PeriscopeShowFiles` - Opens a file selector for files associated with the current task. Only shows file names, not entire path
+- `:PeriscopeShowFilesFullPath` - Opens a file selector for files associated with the current task. Shows entire path relative to projection directory
 - `:PeriscopeShowTasks` - Opens a task selector
 
 Note, this is my first plugin, so there might be some bugs. Please report them if you find any.
