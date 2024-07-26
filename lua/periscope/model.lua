@@ -115,6 +115,7 @@ function copy_current_task()
 				new_task.name = input
 				new_task.id = workspace.task_id
 				append_task(new_task)
+				set_current_task(new_task.id);
 				save_workspace()
 				nvimtree().filter_tree()
 			else

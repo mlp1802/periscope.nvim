@@ -33,7 +33,7 @@ local function file_sorter()
 	}
 end
 
-local function show_files_for_current_task()
+local function show_files_for_current_task(fullpath)
 	model().remove_deleted_files_from_current_tasks()
 	local task = model().get_current_task()
 	if not task then
@@ -41,14 +41,23 @@ local function show_files_for_current_task()
 		return
 	end
 	local opts = {}
+	local function get_show_name(path)
+		if fullpath then
+			return path
+		else
+			return vim.fn.fnamemodify(path, ":t")
+		end
+	end
 	pickers.new(opts, {
+
 		prompt_title = task.name .. ": files",
 		finder = finders.new_table {
 			results = task.files,
 			entry_maker = function(entry)
 				return {
 					value = entry,
-					display = entry.path, --.. " : " .. entry.usage,
+					display = get_show_name(entry.path),
+
 					ordinal = entry.path,
 				}
 			end,
