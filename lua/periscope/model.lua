@@ -6,7 +6,7 @@ local script = require('periscope.scripts')
 local current_workspace = nil
 local START_USAGE = 100
 --Forward declarations
-local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task, copy_current_task
+local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_deleted_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task, copy_current_task
 local function new_file(path)
 	return {
 		path = path,
@@ -76,7 +76,8 @@ end
 function set_current_task(task_id)
 	local workspace = get_current_workspace()
 	workspace.current_task_id = task_id
-	save_workspace()
+	remove_deleted_files_from_current_tasks() --just to clean up the list..there might be a better place to do this
+	--save_workspace()
 end
 
 -- Appends a task to the workspace
@@ -171,12 +172,13 @@ function get_current_task_name()
 end
 
 -- Removes files that have been deleted from the current task
-function remove_files_from_current_tasks()
+function remove_deleted_files_from_current_tasks()
 	local current_task = get_current_task()
 	if current_task == nil then
 		return
 	end
 	local filteres_files = lume.filter(current_task.files, function(file)
+		--check if file exists
 		return vim.fn.filereadable(file.path)
 	end)
 	current_task.files = filteres_files
@@ -198,7 +200,10 @@ end
 
 -- Adds a file to the current task
 function add_file_to_current_task(path)
-	--print("Adding file to current task: " .. to_relative_path(path))
+	-- Check if the file is in the .git directory
+	if string.match(path, "/%.git/") then
+		return
+	end
 	local task = get_current_task()
 	if task then
 		remove_file_from_current_task(path)
@@ -233,6 +238,7 @@ end
 
 -- Called when a buffer is entered
 function buffer_entered(path)
+	remove_deleted_files_from_current_tasks() --just to clean up the list..there might be a better place to do this
 	if not vim.fn.filereadable(path) then
 		return
 	end
@@ -291,7 +297,7 @@ function get_current_task_id()
 end
 
 return {
-	remove_deleted_files_from_current_tasks = remove_files_from_current_tasks,
+	remove_deleted_files_from_current_tasks = remove_deleted_files_from_current_tasks,
 	new_task = new_task,
 	buffer_entered = buffer_entered,
 	buffer_left = buffer_left,
