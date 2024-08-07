@@ -174,12 +174,19 @@ end
 -- Removes files that have been deleted from the current task
 function remove_deleted_files_from_current_tasks()
 	local current_task = get_current_task()
+	print("Removing deleted files from current task")
 	if current_task == nil then
 		return
 	end
 	local filteres_files = lume.filter(current_task.files, function(file)
 		--check if file exists
-		return vim.fn.filereadable(file.path)
+
+		local exists = vim.fn.filereadable(file.path) == 1;
+		--print("Checking if file exists 2: " .. file.path .. tostring(exists))
+		--	if exists then
+		--		print("File does exist: " .. file.path)
+		--	end
+		return exists
 	end)
 	current_task.files = filteres_files
 	save_workspace()
