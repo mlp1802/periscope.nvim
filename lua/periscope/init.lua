@@ -35,7 +35,8 @@ local function setup_auto_commands()
 		model().buffer_entered(event.fname)
 	end)
 	vim.api.nvim_create_autocmd({ "BufEnter" }, {
-		pattern = { "*.*" },
+		--pattern = { "*.*" },
+		pattern = { "*" },
 		group = augroup,
 		callback = function(args)
 			if not enabled then
@@ -45,7 +46,7 @@ local function setup_auto_commands()
 		end,
 	})
 	vim.api.nvim_create_autocmd({ "BufLeave", "BufWinLeave" }, {
-		pattern = { "*.*" },
+		pattern = { "*" },
 		group = augroup,
 		callback = function(args)
 			if not enabled then
