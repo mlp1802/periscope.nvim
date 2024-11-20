@@ -56,7 +56,7 @@ local function show_files_for_current_task(fullpath)
 			entry_maker = function(entry)
 				return {
 					value = entry,
-					display = get_show_name(entry.path),
+					display = get_show_name(entry.path).." ("..entry.usage..")",
 
 					ordinal = entry.path,
 				}

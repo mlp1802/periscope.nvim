@@ -4,7 +4,7 @@ local lume_e = require('periscope.lume_extra')
 local utils = require('periscope.utils')
 local script = require('periscope.scripts')
 local current_workspace = nil
-local START_USAGE = 200
+local START_USAGE = 1000
 --Forward declarations
 local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_deleted_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task, copy_current_task
 local function new_file(path)
@@ -223,6 +223,7 @@ end
 
 -- Downgrades the usage of all files in a task
 function downgrade_files(task)
+	print("Downgrading files")
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
