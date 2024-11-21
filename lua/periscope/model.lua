@@ -223,7 +223,6 @@ end
 
 -- Downgrades the usage of all files in a task
 function downgrade_files(task)
-	print("Downgrading files")
 	for i, file in ipairs(task.files) do
 		file.usage = file.usage - 1
 		if file.usage < 0 then
