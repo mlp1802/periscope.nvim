@@ -48,17 +48,20 @@ local function show_files_for_current_task(fullpath)
 			return vim.fn.fnamemodify(path, ":t")
 		end
 	end
+	local index = 0;
 	pickers.new(opts, {
 
 		prompt_title = task.name .. ": files",
 		finder = finders.new_table {
 			results = task.files,
 			entry_maker = function(entry)
+				local file_id = index;
+				index = index+1
 				return {
 					value = entry,
-					display = get_show_name(entry.path).." ("..entry.usage..")",
+					display = get_show_name(entry.path).." ("..file_id..")",
 
-					ordinal = entry.path,
+					ordinal = entry.path.." ("..file_id..")",
 				}
 			end,
 		},
