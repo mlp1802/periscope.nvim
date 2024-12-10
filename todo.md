@@ -8,3 +8,5 @@
 - [ ] Manually remove task from workspace
 - [ ] A different picker that sort files by usage
 - [ ] Be able to set usage number
+- [ ] Don't show git diffs
+- [ ] Organize so goto definition works
