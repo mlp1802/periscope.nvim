@@ -182,8 +182,11 @@ function remove_deleted_files_from_current_tasks()
 		return
 	end
 	local filteres_files = lume.filter(current_task.files, function(file)
+		--check if file contains /tmp/ (this is a temporary file)
+                 if string.find(file.path,"/tmp/") then 
+			 return false
+		 end
 		--check if file exists
-
 		local exists = vim.fn.filereadable(file.path) == 1;
 		--print("Checking if file exists 2: " .. file.path .. tostring(exists))
 		--	if exists then
