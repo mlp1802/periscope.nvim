@@ -54,11 +54,12 @@ local function show_files_for_current_task(fullpath)
 		finder = finders.new_table {
 			results = task.files,
 			entry_maker = function(entry)
+				local file_id = entry.file_id or "no_file_id";
 				return {
 					value = entry,
-					display = get_show_name(entry.path),
+					display = get_show_name(entry.path).." ("..file_id..")",
 
-					ordinal = entry.path,
+					ordinal = entry.path.." ("..file_id..")",
 				}
 			end,
 		},
