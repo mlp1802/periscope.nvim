@@ -18,6 +18,7 @@ local function file_sorter()
 		scoring_function = function(_, prompt, ordinal, entry)
 			-- Sort by usage
 			local last_file = model().get_current_workspace().last_file or "no_last_file"
+			print("last_file ", prompt, ordinal, entry.value.path, last_file)
 			if entry.value.path == last_file then
 				return 9999999999999
 			end
@@ -26,153 +27,103 @@ local function file_sorter()
 	}
 end
 
-local function show_files_for_current_task_(fullpath)
-	model().remove_deleted_files_from_current_tasks()
-	local task = model().get_current_task()
-	if not task then
-		print("No current task")
-		return
-	end
-	local opts = {
-		filter_function = function(entry)
-			local prompt = vim.fn.input("Enter exact match filter: ")
-			return entry.path:find(prompt, 1, true) ~= nil
-		end
-	}
-	local function get_show_name(path)
-		if fullpath then
-			return path
-		else
-			return vim.fn.fnamemodify(path, ":t")
-		end
-	end
-	pickers.new(opts, {
 
-		prompt_title = task.name .. ": files",
-		finder = finders.new_table {
-			results = task.files,
-			entry_maker = function(entry)
-				local file_id = entry.file_id or "no_file_id";
-				local display_name = get_show_name(entry.path).." ("..file_id..")"
-				return {
-					value = entry,
-					display = display_name,
-					ordinal = display_name,
-				}
-			end,
-		},
-		sorter = file_sorter(),
-		attach_mappings = function(prompt_bufnr, map)
-			actions.select_default:replace(function()
-				actions.close(prompt_bufnr)
-				local selection = action_state.get_selected_entry()
-				local path = utils.to_absolute_path(selection.value.path)
-				vim.cmd("edit " .. path)
-			end)
-			return true
-		end,
-	}):find()
-end
-
+local fzf_lua = require("fzf-lua")
 local function show_files_for_current_task(fullpath)
-	model().remove_deleted_files_from_current_tasks()
-	local task = model().get_current_task()
-	if not task then
-		print("No current task")
-		return
-	end
+    model().remove_deleted_files_from_current_tasks()
+    local task = model().get_current_task()
 
-	local opts = {}
+    if not task then
+        print("No current task")
+        return
+    end
 
-	-- Helper to get the display name
-	local function get_show_name(path)
-		if fullpath then
-			return path
-		else
-			return vim.fn.fnamemodify(path, ":t")
-		end
-	end
+    -- Helper to get the display name
+    local function get_show_name(path)
+        if fullpath then
+            return path
+        else
+            return vim.fn.fnamemodify(path, ":t")
+        end
+    end
 
-	-- Custom finder that filters for exact matches
-	local function custom_finder(search)
-		return finders.new_table {
-			results = vim.tbl_filter(function(file)
-				-- Filter by exact match of the search string in the filename
-				return vim.fn.fnamemodify(file.path, ":t"):find(search, 1, true) ~= nil
-			end, task.files),
-			entry_maker = function(entry)
-				local file_id = entry.file_id or "no_file_id"
-				return {
-					value = entry,
-					display = get_show_name(entry.path) .. " (" .. file_id .. ")",
-					ordinal = entry.path, -- Use the full path for sorting
-				}
-			end,
-		}
-	end
+    -- Sort files by usage in descending order
+    table.sort(task.files, function(a, b)
+        return (a.usage or 0) > (b.usage or 0)
+    end)
 
-	-- Custom sorter that sorts by `file.usage`
-	local function custom_sorter()
-		return sorters.Sorter:new {
-			scoring_function = function(_, _, _, entry1, entry2)
-				local usage1 = entry1.value.usage or 0
-				local usage2 = entry2.value.usage or 0
-				return usage1 > usage2 and -1 or (usage1 < usage2 and 1 or 0)
-			end,
-		}
-	end
+    -- Prepare the list of files for fzf
+    local file_list = {}
+    for _, file in ipairs(task.files) do
+        local display_name = get_show_name(file.path)
+        local file_id = file.usage or "no_file_id"
+        table.insert(file_list, string.format("%s (%s)", display_name, file_id))
+    end
 
-	-- Prompt for search term
-	vim.ui.input({ prompt = "Search filename: " }, function(search)
-		if not search or search == "" then
-			print("No search term provided")
-			return
-		end
-
-		pickers.new(opts, {
-			prompt_title = task.name .. ": files",
-			finder = custom_finder(search),
-			sorter = custom_sorter(),
-			attach_mappings = function(prompt_bufnr, map)
-				actions.select_default:replace(function()
-					actions.close(prompt_bufnr)
-					local selection = action_state.get_selected_entry()
-					local path = utils.to_absolute_path(selection.value.path)
-					vim.cmd("edit " .. path)
-				end)
-				return true
-			end,
-		}):find()
-	end)
+    -- Show the list in fzf-lua
+    fzf_lua.fzf_exec(file_list, {
+        prompt = task.name .. ": files> ",
+        actions = {
+            ["default"] = function(selected)
+                -- Extract the file path from the selected item
+                local selected_entry = selected[1]
+                for _, file in ipairs(task.files) do
+                    local display_name = get_show_name(file.path)
+                    if selected_entry:find(display_name, 1, true) then
+                        -- Open the selected file
+                        local path = utils.to_absolute_path(file.path)
+                        vim.cmd("edit " .. path)
+                        return
+                    end
+                end
+            end,
+        },
+    })
 end
+
+
+
+
+--local fzf_lua = require("fzf-lua")
 
 local function show_all_tasks()
-	local current_task_name = model().get_current_task_name() or "No task selected";
-	local opts = {}
-	local tasks = model().get_all_tasks()
-	pickers.new(opts, {
-		prompt_title = "All tasks (current: " .. current_task_name .. ")",
-		finder = finders.new_table {
-			results = tasks,
-			entry_maker = function(entry)
-				return {
-					value = entry,
-					display = entry.name,
-					ordinal = entry.name,
-				}
-			end,
-		},
-		sorter = conf.generic_sorter({}),
-		attach_mappings = function(prompt_bufnr, map)
-			actions.select_default:replace(function()
-				actions.close(prompt_bufnr)
-				local selection = action_state.get_selected_entry()
-				model().set_current_task(selection.value.id)
-				nvim_tree().set_filter_enabled(true)
-			end)
-			return true
-		end,
-	}):find()
+    local current_task_name = model().get_current_task_name() or "No task selected"
+    local tasks = model().get_all_tasks()
+
+    -- Sort tasks by usage (descending)
+    table.sort(tasks, function(a, b)
+        return (a.usage or 0) > (b.usage or 0)
+    end)
+
+    -- Prepare the list of tasks for fzf
+    local task_list = {}
+    for _, task in ipairs(tasks) do
+        local prefix = (task.name == current_task_name) and "[CURRENT] " or ""
+        table.insert(task_list, string.format("%s%s (Usage: %d)", prefix, task.name, task.usage or 0))
+    end
+
+    -- Show the list in fzf-lua
+    fzf_lua.fzf_exec(task_list, {
+        prompt = "All tasks (current: " .. current_task_name .. ")> ",
+        actions = {
+            ["default"] = function(selected)
+                -- Extract the task name (remove prefix and usage information)
+                local selected_name = selected[1]:match("%[CURRENT%]%s*(.-)%s%(%w+.-%)") or
+                                      selected[1]:match("^(.-)%s%(%w+.-%)")
+
+                -- Find the selected task by name
+                for _, task in ipairs(tasks) do
+                    if task.name == selected_name then
+                        -- Set the selected task as the current task
+                        model().set_current_task(task.id)
+                        nvim_tree().set_filter_enabled(true)
+                        print("Task set to: " .. task.name)
+                        return
+                    end
+                end
+            end,
+        },
+    })
 end
 return {
 	show_files_for_current_task = show_files_for_current_task,
