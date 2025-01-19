@@ -14,22 +14,15 @@ end
 local conf = require('telescope.config').values
 -- Custom sorter function
 local function file_sorter()
-	local default_sorter = conf.generic_sorter({})
 	return sorters.Sorter:new {
 		scoring_function = function(_, prompt, ordinal, entry)
-			--when no prompt, sort by usage
-			if prompt == "" then
-				local last_file = model().get_current_workspace().last_file or "no_last_file"
-				if entry.value.path == last_file then
-					return 9999999999999
-				end
-				return -entry.value.usage
-			else
-				--else use default sorter
-				return default_sorter:scoring_function(prompt, ordinal, entry)
+			-- Sort by usage
+			local last_file = model().get_current_workspace().last_file or "no_last_file"
+			if entry.value.path == last_file then
+				return 9999999999999
 			end
+			return -entry.value.usage
 		end,
-
 	}
 end
 
@@ -40,7 +33,12 @@ local function show_files_for_current_task(fullpath)
 		print("No current task")
 		return
 	end
-	local opts = {}
+	local opts = {
+		filter_function = function(entry)
+			local prompt = vim.fn.input("Enter exact match filter: ")
+			return entry.path:find(prompt, 1, true) ~= nil
+		end
+	}
 	local function get_show_name(path)
 		if fullpath then
 			return path
@@ -55,11 +53,11 @@ local function show_files_for_current_task(fullpath)
 			results = task.files,
 			entry_maker = function(entry)
 				local file_id = entry.file_id or "no_file_id";
+				local display_name = get_show_name(entry.path).." ("..file_id..")"
 				return {
 					value = entry,
-					display = get_show_name(entry.path).." ("..file_id..")",
-
-					ordinal = entry.path.." ("..file_id..")",
+					display = display_name,
+					ordinal = display_name,
 				}
 			end,
 		},
