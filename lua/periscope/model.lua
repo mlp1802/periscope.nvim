@@ -87,6 +87,11 @@ end
 function set_current_task(task_id)
 	local workspace = get_current_workspace()
 	workspace.current_task_id = task_id
+	local task = get_current_task()
+        if task.usage ==nil then
+		task.usage = 0
+	end
+	task.usage = task.usage + 1
 	remove_deleted_files_from_current_tasks() --just to clean up the list..there might be a better place to do this
 	--save_workspace()
 end
@@ -104,6 +109,7 @@ function create_task(name)
 	workspace.task_id = workspace.task_id + 1
 	local task_id = workspace.task_id;
 	local task = {
+		usage=0, 
 		id = task_id,
 		name = name,
 		files = {}
