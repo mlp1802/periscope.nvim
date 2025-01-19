@@ -2,7 +2,7 @@
 
 Periscope is a plugin that provides a task focused interface for Neovim. It is inspired by Mylyn for Eclipse.
 
-It intergrates with nvim-tree, and uses Telescope for task and file searching. It allows you to create tasks, add files to tasks, and view tasks. It also provides a way to view the files that are associated with a task.
+It intergrates with nvim-tree, and uses fzf for task and file searching. It allows you to create tasks, add files to tasks, and view tasks. It also provides a way to view the files that are associated with a task.
 
 So what does it do, excatly? Well have you ever wondered why a file tree shows you close to a billion files when you are only working on a few? Periscope allows you to focus on the files that are important to you, and allows you to quickly find the files you need.
 In fact, all the files you need for a particuluar task will probably all be visible to you simultaneously.
@@ -21,7 +21,7 @@ return {
 	"mlp1802/periscope.nvim",
 	name = "periscope",
 	dependencies = {
-		{ "nvim-tree/nvim-tree.lua" }, { "nvim-telescope/telescope.nvim" },
+		{ "nvim-tree/nvim-tree.lua" }, { "ibhagwan/fzf-lua" },
 	},
 	config = function()
 		require('periscope').setup(true) --set to false if you don't want Periscope to start on startup

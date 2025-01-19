@@ -1,9 +1,5 @@
-local action_state = require('telescope.actions.state')
-local actions = require('telescope.actions')
-local pickers = require('telescope.pickers')
-local finders = require('telescope.finders')
-local sorters = require('telescope.sorters')
 local utils = require('periscope.utils')
+local fzf_lua = require("fzf-lua")
 local function nvim_tree()
 	return require('periscope.nvim-tree')
 end
@@ -28,7 +24,6 @@ local function file_sorter()
 end
 
 
-local fzf_lua = require("fzf-lua")
 local function show_files_for_current_task(fullpath)
     model().remove_deleted_files_from_current_tasks()
     local task = model().get_current_task()
