@@ -24,6 +24,8 @@ local function file_sorter()
 end
 
 
+
+
 local function show_files_for_current_task(fullpath)
     model().remove_deleted_files_from_current_tasks()
     local task = model().get_current_task()
@@ -33,16 +35,7 @@ local function show_files_for_current_task(fullpath)
         return
     end
 
-    -- Helper to get the display name
-    local function get_show_name(path)
-        if fullpath then
-            return path
-        else
-            return vim.fn.fnamemodify(path, ":t")
-        end
-    end
-
-    -- Sort files by usage in descending order
+    -- Sort files by usage (descending)
     table.sort(task.files, function(a, b)
         return (a.usage or 0) > (b.usage or 0)
     end)
@@ -50,20 +43,23 @@ local function show_files_for_current_task(fullpath)
     -- Prepare the list of files for fzf
     local file_list = {}
     for _, file in ipairs(task.files) do
-        local display_name = get_show_name(file.path)
-        local file_id = file.usage or "no_file_id"
-        table.insert(file_list, string.format("%s (%s)", display_name, file_id))
+        local display_name = fullpath and file.path or vim.fn.fnamemodify(file.path, ":t")
+        table.insert(file_list, string.format("%s [Usage: %d]", display_name,  file.usage or 0))
     end
 
-    -- Show the list in fzf-lua
+    -- Use fzf-lua with exact matching and pre-sorted files
     fzf_lua.fzf_exec(file_list, {
         prompt = task.name .. ": files> ",
+        fzf_opts = {
+            ["--exact"] = "", -- Enables exact substring matching
+            ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
+        },
         actions = {
             ["default"] = function(selected)
                 -- Extract the file path from the selected item
                 local selected_entry = selected[1]
                 for _, file in ipairs(task.files) do
-                    local display_name = get_show_name(file.path)
+                    local display_name = fullpath and file.path or vim.fn.fnamemodify(file.path, ":t")
                     if selected_entry:find(display_name, 1, true) then
                         -- Open the selected file
                         local path = utils.to_absolute_path(file.path)
@@ -81,6 +77,8 @@ end
 
 --local fzf_lua = require("fzf-lua")
 
+
+
 local function show_all_tasks()
     local current_task_name = model().get_current_task_name() or "No task selected"
     local tasks = model().get_all_tasks()
@@ -97,9 +95,13 @@ local function show_all_tasks()
         table.insert(task_list, string.format("%s%s (Usage: %d)", prefix, task.name, task.usage or 0))
     end
 
-    -- Show the list in fzf-lua
+    -- Use fzf-lua with exact matching and pre-sorted tasks
     fzf_lua.fzf_exec(task_list, {
         prompt = "All tasks (current: " .. current_task_name .. ")> ",
+        fzf_opts = {
+            ["--exact"] = "", -- Enables exact substring matching
+            ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
+        },
         actions = {
             ["default"] = function(selected)
                 -- Extract the task name (remove prefix and usage information)
