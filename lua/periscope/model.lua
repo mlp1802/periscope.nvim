@@ -5,6 +5,7 @@ local utils = require('periscope.utils')
 local script = require('periscope.scripts')
 local current_workspace = nil
 local START_USAGE = 400
+local START_TASK_USAGE = 400
 local FILE_ID=0
 --Forward declarations
 local get_current_workspace, save_workspace, get_current_task, get_current_task_name, remove_deleted_files_from_current_tasks, new_task, buffer_entered, buffer_left, create_task, add_file_to_current_task, get_all_tasks, delete_current_task, get_current_task_id, rename_current_task, copy_current_task
@@ -88,12 +89,25 @@ function set_current_task(task_id)
 	local workspace = get_current_workspace()
 	workspace.current_task_id = task_id
 	local task = get_current_task()
-        if task.usage ==nil then
-		task.usage = 0
-	end
-	task.usage = task.usage + 1
+	downgrade_tasks()
+	task.usage = START_TASK_USAGE
 	remove_deleted_files_from_current_tasks() --just to clean up the list..there might be a better place to do this
-	--save_workspace()
+end
+
+function downgrade_tasks()
+	local workspace = get_current_workspace()
+	workspace.tasks = lume.map(workspace.tasks, function(task)
+		if task.usage == nil then
+			task.usage = 0
+		end
+		task.usage = task.usage - 1
+		if task.usage < 0 then
+			task.usage = 0
+		end
+		return task
+	
+	end)
+	
 end
 
 -- Appends a task to the workspace
@@ -109,7 +123,7 @@ function create_task(name)
 	workspace.task_id = workspace.task_id + 1
 	local task_id = workspace.task_id;
 	local task = {
-		usage=0, 
+		usage=START_TASK_USAGE, 
 		id = task_id,
 		name = name,
 		files = {}
