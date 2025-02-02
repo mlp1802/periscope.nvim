@@ -51,7 +51,7 @@ local function show_files_for_current_task(fullpath)
     fzf_lua.fzf_exec(file_list, {
         prompt = task.name .. ": files> ",
         fzf_opts = {
-            ["--exact"] = "", -- Enables exact substring matching
+           -- ["--exact"] = "", -- Enables exact substring matching
             ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
         },
         actions = {
@@ -99,7 +99,7 @@ local function show_all_tasks()
     fzf_lua.fzf_exec(task_list, {
         prompt = "All tasks (current: " .. current_task_name .. ")> ",
         fzf_opts = {
-            ["--exact"] = "", -- Enables exact substring matching
+          --  ["--exact"] = "", -- Enables exact substring matching
             ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
         },
         actions = {
