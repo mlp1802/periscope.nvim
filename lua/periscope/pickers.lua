@@ -34,8 +34,6 @@ local function show_files_for_current_task(fullpath)
         print("No current task")
         return
     end
-
-    -- Sort files by usage (descending)
     table.sort(task.files, function(a, b)
         return (a.usage or 0) > (b.usage or 0)
     end)
@@ -78,6 +76,57 @@ end
 --local fzf_lua = require("fzf-lua")
 
 
+
+
+
+
+
+
+
+
+local function grep_in_task_files()
+    local task = model().get_current_task()
+
+    if not task then
+        print("No current task selected")
+        return
+    end
+
+    -- Collect absolute file paths
+    local files = {}
+    for _, file in ipairs(task.files) do
+        local abs_path = utils.to_absolute_path(file.path)
+        table.insert(files, abs_path)
+    end
+
+    if #files == 0 then
+        print("No files in the current task")
+        return
+    end
+
+    -- Construct the ripgrep command without manually appending file paths
+    local rg_cmd = "rg --vimgrep --smart-case --hidden --no-heading --column --line-number --files-with-matches"
+
+    -- Use fzf-lua with ripgrep restricted to task files
+    fzf_lua.fzf_exec(rg_cmd, {
+        prompt = "Search in task files> ",
+        cwd = vim.loop.cwd(), -- Run from project root
+        input = table.concat(files, "\n"), -- Pass file list via stdin
+        fzf_opts = {
+            ["--tiebreak"] = "index", -- Maintain file order
+        },
+        actions = {
+            ["default"] = function(selected)
+                -- Extract file path and line number from selected match
+                local filename, line = selected[1]:match("^(.-):(%d+):")
+                if filename and line then
+                    vim.cmd("edit " .. filename)
+                    vim.cmd(":" .. line)
+                end
+            end,
+        },
+    })
+end
 
 local function show_all_tasks()
     local current_task_name = model().get_current_task_name() or "No task selected"
@@ -124,6 +173,6 @@ local function show_all_tasks()
 end
 return {
 	show_files_for_current_task = show_files_for_current_task,
-	show_all_tasks = show_all_tasks,
+	show_all_tasks = show_all_tasks,grep_in_task_files = grep_in_task_files
 
 }
