@@ -3,9 +3,9 @@ local function model()
 	return require('periscope.model')
 end
 local nvim_tree_api = require('nvim-tree.api')
-local view = require('nvim-tree.view')
-local utils = require('nvim-tree.utils')
-local filter = require('nvim-tree.explorer.filters')
+--local view = require('nvim-tree.view')
+--local utils = require('nvim-tree.utils')
+--local filter = require('nvim-tree.explorer.filters')
 local nvim_tree_api = require('nvim-tree.api')
 local tree = nvim_tree_api.tree
 
