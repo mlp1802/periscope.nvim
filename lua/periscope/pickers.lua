@@ -52,8 +52,8 @@ local function show_files_for_current_task(fullpath)
         prompt = task.name .. ": files> ",
         fzf_opts = {
            -- ["--exact"] = "", -- Enables exact substring matching
-            --["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
- 	    ["--tiebreak"] = "begin,length,index",
+            ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
+ 	    --["--tiebreak"] = "begin,length,index",
         },
         actions = {
             ["default"] = function(selected)
