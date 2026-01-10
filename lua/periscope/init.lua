@@ -118,11 +118,11 @@ local function setup_user_commands()
 		end)
 	end, {})
 end
-function setup(enabled)
-	enabled = enabled
-	nvimtree().set_filter_enabled(enabled)
-	setup_auto_commands();
-	setup_user_commands();
+function setup(start_enabled)
+        enabled = start_enabled
+        nvimtree().set_filter_enabled(start_enabled)
+        setup_auto_commands();
+        setup_user_commands();
 end
 
 --setup(true)

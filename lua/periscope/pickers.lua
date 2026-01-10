@@ -13,11 +13,10 @@ local function file_sorter()
 	return sorters.Sorter:new {
 		scoring_function = function(_, prompt, ordinal, entry)
 			-- Sort by usage
-			local last_file = model().get_current_workspace().last_file or "no_last_file"
-			print("last_file ", prompt, ordinal, entry.value.path, last_file)
-			if entry.value.path == last_file then
-				return 9999999999999
-			end
+                        local last_file = model().get_current_workspace().last_file or "no_last_file"
+                        if entry.value.path == last_file then
+                                return 9999999999999
+                        end
 			return -entry.value.usage
 		end,
 	}
