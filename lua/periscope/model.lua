@@ -192,8 +192,6 @@ function get_current_task()
 		if task==nil then
 			return
 		end
-			print (task)
-			print (task.name)
 			return task.id == workspace.current_task_id
 	end)
 end
