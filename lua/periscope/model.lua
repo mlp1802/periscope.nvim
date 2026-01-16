@@ -113,7 +113,7 @@ end
 -- Appends a task to the workspace
 function append_task(task)
 	local workspace = get_current_workspace()
-	workspace.tasks = lume.push(workspace.tasks, task)
+	table.insert(workspace.tasks, task)
 	save_workspace()
 end
 
