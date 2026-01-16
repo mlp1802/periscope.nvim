@@ -112,9 +112,9 @@ end
 
 -- Appends a task to the workspace
 function append_task(task)
-        local workspace = get_current_workspace()
-        workspace.tasks = lume.push(workspace.tasks, task)
-        save_workspace()
+	local workspace = get_current_workspace()
+	workspace.tasks = lume.push(workspace.tasks, task)
+	save_workspace()
 end
 
 -- Creates a new task and adds it to the workspace
@@ -189,7 +189,7 @@ end
 function get_current_task()
 	local workspace = get_current_workspace()
 	return lume_e.find_f(workspace.tasks, function(task)
-		return task.id == workspace.current_task_id
+			return task.id == workspace.current_task_id
 	end)
 end
 
