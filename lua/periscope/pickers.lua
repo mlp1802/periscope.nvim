@@ -43,14 +43,15 @@ local function show_files_for_current_task(fullpath)
     local file_list = {}
     for _, file in ipairs(task.files) do
         local display_name = fullpath and file.path or vim.fn.fnamemodify(file.path, ":t")
-        table.insert(file_list, string.format("%s [Usage: %d]", display_name,  file.usage or 0))
+        --table.insert(file_list, string.format("%s [Usage: %d]", display_name,  file.usage or 0))
+        table.insert(file_list, string.format("%s", display_name ))
     end
 
     -- Use fzf-lua with exact matching and pre-sorted files
     fzf_lua.fzf_exec(file_list, {
         prompt = task.name .. ": files> ",
         fzf_opts = {
-           -- ["--exact"] = "", -- Enables exact substring matching
+            -- ["--exact"] = "", -- Enables exact substring matching
             ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
  	    --["--tiebreak"] = "begin,length,index",
         },
