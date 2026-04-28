@@ -7,24 +7,6 @@ function model()
 	return require('periscope.model')
 end
 
-local conf = require('telescope.config').values
--- Custom sorter function
-local function file_sorter()
-	return sorters.Sorter:new {
-		scoring_function = function(_, prompt, ordinal, entry)
-			-- Sort by usage
-                        local last_file = model().get_current_workspace().last_file or "no_last_file"
-                        if entry.value.path == last_file then
-                                return 9999999999999
-                        end
-			return -entry.value.usage
-		end,
-	}
-end
-
-
-
-
 local function show_files_for_current_task(fullpath)
     model().remove_deleted_files_from_current_tasks()
     local task = model().get_current_task()
@@ -51,9 +33,11 @@ local function show_files_for_current_task(fullpath)
     fzf_lua.fzf_exec(file_list, {
         prompt = task.name .. ": files> ",
         fzf_opts = {
-            -- ["--exact"] = "", -- Enables exact substring matching
-            ["--tiebreak"] = "index", -- Ensure sorting respects the input order (pre-sorted by usage)
- 	    --["--tiebreak"] = "begin,length,index",
+            -- Keep the list ordered only by usage; fzf still filters out non-matches.
+            ["--no-sort"] = "",
+            ["--exact"] = "", -- Enables exact substring matching
+            ["--tiebreak"] = "index",
+	    ["--query"] = "^"
         },
         actions = {
             ["default"] = function(selected)
