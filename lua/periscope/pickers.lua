@@ -25,8 +25,8 @@ local function show_files_for_current_task(fullpath)
     local file_list = {}
     for _, file in ipairs(task.files) do
         local display_name = fullpath and file.path or vim.fn.fnamemodify(file.path, ":t")
-        table.insert(file_list, string.format("%s [Usage: %d]", display_name,  file.usage or 0))
-        --table.insert(file_list, string.format("%s", display_name ))
+        --table.insert(file_list, string.format("%s [Usage: %d]", display_name,  file.usage or 0))
+        table.insert(file_list, string.format("%s", display_name ))
     end
 
     -- Use fzf-lua with exact matching and pre-sorted files
@@ -35,7 +35,9 @@ local function show_files_for_current_task(fullpath)
         fzf_opts = {
             -- Keep the list ordered only by usage; fzf still filters out non-matches.
             ["--no-sort"] = "",
+            ["--exact"] = "", -- Enables exact substring matching
             ["--tiebreak"] = "index",
+	    ["--query"] = "^"
         },
         actions = {
             ["default"] = function(selected)
