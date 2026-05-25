@@ -37,7 +37,7 @@ local function show_files_for_current_task(fullpath)
             ["--no-sort"] = "",
             ["--exact"] = "", -- Enables exact substring matching
             ["--tiebreak"] = "index",
-	    ["--query"] = "^"
+	   -- ["--query"] = "^"
         },
         actions = {
             ["default"] = function(selected)
